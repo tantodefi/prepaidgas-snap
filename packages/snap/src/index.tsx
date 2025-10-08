@@ -20,6 +20,7 @@ import {
   Section,
   Dropdown,
   Option,
+  Spinner,
 } from '@metamask/snaps-sdk/jsx';
 
 // ============================================================================
@@ -1156,20 +1157,37 @@ export const onUserInput: OnUserInputHandler = async ({
   event,
   context,
 }) => {
-  console.log('User input received:', event);
+  console.log('📥 User input received:', { id, event });
 
-  // Handle form submission from add coupon dialog
+  // Handle form submission from add coupon dialog or home page
   if (
     event.type === 'FormSubmitEvent' &&
-    (event.name === 'addCouponForm' ||
-      event.name === 'addCouponFormHome')
+    (event.name === 'addCouponForm' || event.name === 'addCouponFormHome')
   ) {
-    const formData = event.value as {
-      couponCode: string;
-      label: string;
-    };
+    const formData = event.value as Record<string, string>;
+    const couponCode = formData.couponCode || '';
+    const label = formData.label || '';
+
+    if (!couponCode) {
+      return;
+    }
 
     try {
+      // Show loading
+      await snap.request({
+        method: 'snap_updateInterface',
+        params: {
+          id,
+          ui: (
+            <Box>
+              <Heading>Adding Coupon...</Heading>
+              <Spinner />
+              <Text>Please wait</Text>
+            </Box>
+          ),
+        },
+      });
+
       // Parse the coupon code
       let paymasterContext = '';
       let paymasterAddress = '';
@@ -1178,7 +1196,7 @@ export const onUserInput: OnUserInputHandler = async ({
       let chainId = '11155111';
 
       try {
-        const parsed = JSON.parse(formData.couponCode);
+        const parsed = JSON.parse(couponCode);
         paymasterContext = parsed.paymasterContext || parsed.context;
         paymasterAddress = parsed.paymasterAddress || parsed.address;
         poolType = parsed.poolType || 'multi-use';
@@ -1186,8 +1204,8 @@ export const onUserInput: OnUserInputHandler = async ({
         chainId = parsed.chainId || '11155111';
       } catch {
         // If not JSON, assume it's just the context
-        paymasterContext = formData.couponCode;
-        paymasterAddress = '0x0000000000000000000000000000000000000000'; // Placeholder
+        paymasterContext = couponCode;
+        paymasterAddress = '0x0000000000000000000000000000000000000000';
       }
 
       // Add the coupon
@@ -1197,7 +1215,7 @@ export const onUserInput: OnUserInputHandler = async ({
         poolType,
         chainId,
         network,
-        label: formData.label || undefined,
+        label: label || undefined,
       });
 
       // Update UI to show success
