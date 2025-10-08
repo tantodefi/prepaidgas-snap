@@ -1020,7 +1020,7 @@ export const onHomePage: OnHomePageHandler = async () => {
         <Divider />
 
         {hasCoupons ? (
-          <>
+          <Box>
             <Banner
               severity="success"
               title={`${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`}
@@ -1030,7 +1030,7 @@ export const onHomePage: OnHomePageHandler = async () => {
             <Divider />
 
             {coupons.map((coupon) => (
-              <>
+              <Box key={coupon.id}>
                 <Section>
                   <Heading>{coupon.label || coupon.id}</Heading>
                   <Row label="Type">
@@ -1051,7 +1051,7 @@ export const onHomePage: OnHomePageHandler = async () => {
                   </Row>
                 </Section>
                 <Divider />
-              </>
+              </Box>
             ))}
 
             <Banner severity="info" title="How to Use">
@@ -1059,9 +1059,9 @@ export const onHomePage: OnHomePageHandler = async () => {
                 Connect from a dapp to use your coupons for gasless transactions
               </Text>
             </Banner>
-          </>
+          </Box>
         ) : (
-          <>
+          <Box>
             <Banner severity="warning" title="No Coupons Yet">
               <Text>
                 Visit testnet.prepaidgas.xyz to purchase prepaid gas credits
@@ -1078,7 +1078,7 @@ export const onHomePage: OnHomePageHandler = async () => {
             <Text>
               Visit: https://site-cqrq0u4d3-tantodefis-projects.vercel.app
             </Text>
-          </>
+          </Box>
         )}
       </Box>
     ),
