@@ -750,6 +750,8 @@ Now users can just visit your Vercel site and the snap installs from npm!
 
 ## Links
 
+- **GitHub Repository**: https://github.com/tantodefi/prepaidgas-snap
+- **Live Demo**: https://site-cqrq0u4d3-tantodefis-projects.vercel.app
 - **Website**: https://testnet.prepaidgas.xyz
 - **Demo App**: https://demo.prepaidgas.xyz
 - **MetaMask Snaps Docs**: https://docs.metamask.io/snaps/

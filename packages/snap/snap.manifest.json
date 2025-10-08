@@ -4,7 +4,7 @@
   "proposedName": "Prepaid Gas Manager",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/tantodefi/prepaidgas-snap.git"
   },
   "source": {
     "shasum": "B3kard42B3w8Y0PHcqOSB8F6EFr8H7t8kbtk0m9KEok=",
