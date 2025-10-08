@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0",
+  "description": "Prepaid Gas Snap - Manage your prepaid gas coupons and enable gasless transactions",
+  "proposedName": "Prepaid Gas Manager",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+  },
+  "source": {
+    "shasum": "B3kard42B3w8Y0PHcqOSB8F6EFr8H7t8kbtk0m9KEok=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "packageName": "prepaidgas-snap",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "snap_dialog": {},
+    "snap_manageState": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": false
+    }
+  },
+  "platformVersion": "9.3.0",
+  "manifestVersion": "0.1"
+}
