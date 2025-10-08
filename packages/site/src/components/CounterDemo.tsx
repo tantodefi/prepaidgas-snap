@@ -145,14 +145,44 @@ export const CounterDemo = ({
       );
       addLog(`📝 Pool type: ${paymasterData.poolType}`);
 
-      // TODO: Replace with actual smart contract transaction
-      // For now, simulate the transaction
-      addLog('⏳ Sending transaction with paymaster...');
+      /*
+       * TODO: Replace simulation with actual smart contract call
+       * 
+       * Example with ethers.js and your counter contract:
+       * 
+       * const provider = new ethers.BrowserProvider(window.ethereum);
+       * const signer = await provider.getSigner();
+       * 
+       * const counterContract = new ethers.Contract(
+       *   COUNTER_ADDRESS, // Your deployed counter contract
+       *   COUNTER_ABI,     // Counter ABI
+       *   signer
+       * );
+       * 
+       * // Construct transaction with paymaster data
+       * const tx = await counterContract.increment({
+       *   // Add paymaster fields based on your implementation:
+       *   // For ERC-4337: paymasterAndData
+       *   // For your custom: use paymasterData.paymasterContext
+       * });
+       * 
+       * addLog(`📤 Transaction sent: ${tx.hash}`);
+       * await tx.wait();
+       * addLog('✅ Transaction confirmed!');
+       * 
+       * // Read the new counter value from chain
+       * const newCount = await counterContract.count();
+       * setCount(Number(newCount));
+       */
+
+      // SIMULATION ONLY - Replace this:
+      addLog('⏳ Simulating transaction with paymaster...');
+      addLog('💡 See TODO in CounterDemo.tsx to use real contract');
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Simulate success
-      addLog('✅ Transaction confirmed!');
-      addLog('🎉 Counter incremented using prepaid gas');
+      addLog('✅ Transaction simulated successfully!');
+      addLog('🎉 Counter incremented (local state only)');
       setCount((c) => c + 1);
     } catch (error) {
       console.error('Transaction failed:', error);

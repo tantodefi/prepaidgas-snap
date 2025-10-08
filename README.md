@@ -748,6 +748,87 @@ To make it work without local snap server:
 
 Now users can just visit your Vercel site and the snap installs from npm!
 
+## Using with Your Counter Contract
+
+### Current State: Simulation
+
+The counter demo **currently simulates transactions** - it:
+- ✅ Gets paymaster data from snap
+- ✅ Shows transaction flow
+- ✅ Increments counter (local state)
+- ❌ Doesn't send real transactions (yet)
+
+### To Use Your Real Counter Contract
+
+The demo at https://demo.prepaidgas.xyz uses a real counter contract. To connect to it:
+
+**1. Find your counter contract details:**
+- Contract address (e.g., from demo.prepaidgas.xyz)
+- Contract ABI
+- Network/chain ID
+
+**2. Update `CounterDemo.tsx`:**
+
+Replace the TODO section (lines 148-186) with:
+
+```typescript
+// Install ethers: yarn add ethers
+import { ethers } from 'ethers';
+
+const COUNTER_ADDRESS = '0x...'; // Your deployed counter
+const COUNTER_ABI = [ /* Your ABI */ ];
+
+// In handleIncrement function:
+const provider = new ethers.BrowserProvider(window.ethereum);
+const signer = await provider.getSigner();
+
+const counterContract = new ethers.Contract(
+  COUNTER_ADDRESS,
+  COUNTER_ABI,
+  signer
+);
+
+// Send transaction with paymaster
+const tx = await counterContract.increment({
+  // Add paymaster data here based on your implementation
+  // This depends on how your paymaster contract works
+});
+
+addLog(`📤 Transaction sent: ${tx.hash.slice(0, 10)}...`);
+await tx.wait();
+addLog('✅ Transaction confirmed!');
+
+// Read the new value from chain
+const newCount = await counterContract.count();
+setCount(Number(newCount));
+```
+
+**3. Add ethers dependency:**
+
+```bash
+cd packages/site
+yarn add ethers@^6.0.0
+```
+
+**4. Configure for your network:**
+
+Match the chainId in your coupons to your counter contract's network.
+
+### State: On-Chain vs Local
+
+**Simulated (current):**
+- Counter resets on page refresh
+- No gas used
+- No blockchain interaction
+
+**Real contract (after implementing above):**
+- Counter persists on-chain
+- Uses prepaid gas via paymaster
+- Can be read by anyone
+- Transaction visible on block explorer
+
+The snap and paymaster integration **already works** - you just need to connect it to your actual contract!
+
 ## Links
 
 - **GitHub Repository**: https://github.com/tantodefi/prepaidgas-snap
