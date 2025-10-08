@@ -1089,12 +1089,16 @@ export const onHomePage: OnHomePageHandler = async () => {
             <Input
               name="label"
               placeholder={
-                coupons.length > 0 ? 'e.g., My Second Card' : 'e.g., My Gas Card'
+                coupons.length > 0
+                  ? 'e.g., My Second Card'
+                  : 'e.g., My Gas Card'
               }
             />
           </Field>
           <Button type="submit" name="submitCoupon">
-            {coupons.length > 0 ? '+ Add Another Coupon' : 'Configure Paymaster'}
+            {coupons.length > 0
+              ? '+ Add Another Coupon'
+              : 'Configure Paymaster'}
           </Button>
         </Form>
 
@@ -1141,23 +1145,31 @@ export const onHomePage: OnHomePageHandler = async () => {
  * Handle user input from interactive forms
  * This is called when users interact with Form/Button/Input components
  */
-export const onUserInput: OnUserInputHandler = async ({
-  id,
-  event,
-  context,
-}) => {
+export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   console.log('📥 User input received:', { id, event });
 
-  // Handle form submission from add coupon dialog or home page
-  if (
-    event.type === 'FormSubmitEvent' &&
-    (event.name === 'addCouponForm' || event.name === 'addCouponFormHome')
-  ) {
+  // Handle form submission from home page
+  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponFormHome') {
     const formData = event.value as Record<string, string>;
     const couponCode = formData.couponCode || '';
     const label = formData.label || '';
 
-    if (!couponCode) {
+    console.log('Form data:', { couponCode, label });
+
+    if (!couponCode || couponCode.trim() === '') {
+      await snap.request({
+        method: 'snap_updateInterface',
+        params: {
+          id,
+          ui: (
+            <Box>
+              <Banner severity="warning" title="Missing Input">
+                <Text>Please enter your gas card context</Text>
+              </Banner>
+            </Box>
+          ),
+        },
+      });
       return;
     }
 
@@ -1171,7 +1183,7 @@ export const onUserInput: OnUserInputHandler = async ({
             <Box>
               <Heading>Adding Coupon...</Heading>
               <Spinner />
-              <Text>Please wait</Text>
+              <Text>Please wait while we configure your paymaster</Text>
             </Box>
           ),
         },
@@ -1214,16 +1226,13 @@ export const onUserInput: OnUserInputHandler = async ({
           id,
           ui: (
             <Box>
-              <Banner severity="success" title="✓ Coupon Added Successfully!">
-                <Text>Your prepaid gas coupon is ready to use</Text>
+              <Banner severity="success" title="✓ Coupon Added!">
+                <Text>{newCoupon.label || newCoupon.id} is ready to use</Text>
               </Banner>
               <Divider />
               <Section>
                 <Row label="Coupon ID">
                   <Value value={newCoupon.id} />
-                </Row>
-                <Row label="Label">
-                  <Value value={newCoupon.label || 'No label'} />
                 </Row>
                 <Row label="Type">
                   <Value value={newCoupon.poolType} />
@@ -1233,28 +1242,26 @@ export const onUserInput: OnUserInputHandler = async ({
                 </Row>
               </Section>
               <Divider />
-              <Text>You can now use this coupon for gasless transactions!</Text>
+              <Text>Close and reopen this page to see your coupon in the list!</Text>
             </Box>
           ),
         },
       });
     } catch (error) {
-      // Update UI to show error
+      console.error('Error adding coupon:', error);
       await snap.request({
         method: 'snap_updateInterface',
         params: {
           id,
           ui: (
             <Box>
-              <Banner severity="danger" title="Error Adding Coupon">
+              <Banner severity="danger" title="Error">
                 <Text>
-                  {error instanceof Error
-                    ? error.message
-                    : 'Unknown error occurred'}
+                  {error instanceof Error ? error.message : 'Failed to add coupon'}
                 </Text>
               </Banner>
               <Divider />
-              <Text>Please check your coupon code and try again.</Text>
+              <Text>Please check your coupon code format and try again</Text>
             </Box>
           ),
         },
