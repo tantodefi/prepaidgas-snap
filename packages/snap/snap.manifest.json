@@ -7,7 +7,7 @@
     "url": "https://github.com/tantodefi/prepaidgas-snap.git"
   },
   "source": {
-    "shasum": "l3vRJjdbsIlmi+8SgmJ/39qdQ63dcgEeOprxwgqRDG4=",
+    "shasum": "Vfosx1taaJpak8qQN6DryOVVlionWUd9K6S6yeNlheY=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -22,7 +22,8 @@
     "endowment:rpc": {
       "dapps": true,
       "snaps": false
-    }
+    },
+    "endowment:page-home": {}
   },
   "platformVersion": "9.3.0",
   "manifestVersion": "0.1"

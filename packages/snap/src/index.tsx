@@ -1,4 +1,7 @@
-import type { OnRpcRequestHandler } from '@metamask/snaps-sdk';
+import type {
+  OnRpcRequestHandler,
+  OnHomePageHandler,
+} from '@metamask/snaps-sdk';
 import {
   Box,
   Text,
@@ -304,8 +307,8 @@ async function showAddCouponFormDialog(
           </Section>
           <Divider />
           <Text>
-            <Bold>Approve</Bold> = Quick Mode (Recommended) • <Bold>Reject</Bold> =
-            Manual Mode
+            <Bold>Approve</Bold> = Quick Mode (Recommended) •{' '}
+            <Bold>Reject</Bold> = Manual Mode
           </Text>
         </Box>
       ),
@@ -328,7 +331,8 @@ async function showAddCouponFormDialog(
             </Banner>
             <Divider />
             <Text>
-              The code includes your paymaster address, context, and pool details.
+              The code includes your paymaster address, context, and pool
+              details.
             </Text>
           </Box>
         ),
@@ -428,7 +432,9 @@ async function showAddCouponFormDialog(
             <Bold>Step 1 of 5:</Bold> Paymaster Context
           </Text>
           <Divider />
-          <Text>Enter the paymaster context (hex or base64 encoded string)</Text>
+          <Text>
+            Enter the paymaster context (hex or base64 encoded string)
+          </Text>
         </Box>
       ),
       placeholder: '0x...',
@@ -578,7 +584,7 @@ async function showCouponDetailsDialog(coupon: PrepaidCoupon): Promise<void> {
         <Box>
           <Heading>💳 {coupon.label || 'Prepaid Gas Coupon'}</Heading>
           <Divider />
-          
+
           <Section>
             <Row label="Coupon ID">
               <Value value={coupon.id} />
@@ -642,12 +648,15 @@ async function showCouponsListDialog(): Promise<void> {
   const content = (
     <Box>
       <Heading>💳 Your Gas Coupons</Heading>
-      <Banner severity="success" title={`${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`}>
+      <Banner
+        severity="success"
+        title={`${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`}
+      >
         <Text>Manage your prepaid gas credits below</Text>
       </Banner>
       <Divider />
       {coupons.map((coupon) => (
-        <>
+        <Box key={coupon.id}>
           <Section>
             <Heading>{coupon.label || coupon.id}</Heading>
             <Row label="Type">
@@ -661,7 +670,7 @@ async function showCouponsListDialog(): Promise<void> {
             </Row>
           </Section>
           <Divider />
-        </>
+        </Box>
       ))}
     </Box>
   );
@@ -989,4 +998,89 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     default:
       throw new Error(`Method not found: ${request.method}`);
   }
+};
+
+// ============================================================================
+// Home Page Handler
+// ============================================================================
+
+/**
+ * Show the snap's home page in MetaMask
+ * Users can access this from: MetaMask → Snaps → Prepaid Gas Manager → View
+ */
+export const onHomePage: OnHomePageHandler = async () => {
+  const coupons = await listCoupons();
+  const hasCoupons = coupons.length > 0;
+
+  return {
+    content: (
+      <Box>
+        <Heading>💳 Prepaid Gas Manager</Heading>
+        <Text>Manage your prepaid gas coupons for gasless transactions</Text>
+        <Divider />
+
+        {hasCoupons ? (
+          <>
+            <Banner
+              severity="success"
+              title={`${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`}
+            >
+              <Text>Your prepaid gas credits are ready to use!</Text>
+            </Banner>
+            <Divider />
+
+            {coupons.map((coupon) => (
+              <>
+                <Section>
+                  <Heading>{coupon.label || coupon.id}</Heading>
+                  <Row label="Type">
+                    <Value value={coupon.poolType} />
+                  </Row>
+                  <Row label="Network">
+                    <Value value={coupon.network} />
+                  </Row>
+                  <Row label="Paymaster">
+                    <Value
+                      value={`${coupon.paymasterAddress.slice(0, 6)}...${coupon.paymasterAddress.slice(-4)}`}
+                    />
+                  </Row>
+                  <Row label="Added">
+                    <Value
+                      value={new Date(coupon.addedAt).toLocaleDateString()}
+                    />
+                  </Row>
+                </Section>
+                <Divider />
+              </>
+            ))}
+
+            <Banner severity="info" title="How to Use">
+              <Text>
+                Connect from a dapp to use your coupons for gasless transactions
+              </Text>
+            </Banner>
+          </>
+        ) : (
+          <>
+            <Banner severity="warning" title="No Coupons Yet">
+              <Text>
+                Visit testnet.prepaidgas.xyz to purchase prepaid gas credits
+              </Text>
+            </Banner>
+            <Divider />
+            <Text>
+              <Bold>Getting Started:</Bold>
+            </Text>
+            <Text>1. Purchase gas credits on testnet.prepaidgas.xyz</Text>
+            <Text>2. Copy your gas card context</Text>
+            <Text>3. Add it via the companion site or dapp</Text>
+            <Divider />
+            <Text>
+              Visit: https://site-cqrq0u4d3-tantodefis-projects.vercel.app
+            </Text>
+          </>
+        )}
+      </Box>
+    ),
+  };
 };
