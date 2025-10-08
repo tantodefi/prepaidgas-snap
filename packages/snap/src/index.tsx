@@ -1,6 +1,7 @@
 import type {
   OnRpcRequestHandler,
   OnHomePageHandler,
+  OnUserInputHandler,
 } from '@metamask/snaps-sdk';
 import {
   Box,
@@ -906,14 +907,45 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'showAddCouponForm': {
-      // Multi-step form using snap dialogs
-      const result = await showAddCouponFormDialog(origin);
+      // Show interactive form with snap_createInterface
+      const interfaceId = await snap.request({
+        method: 'snap_createInterface',
+        params: {
+          ui: (
+            <Box>
+              <Heading>Add Prepaid Gas Coupon</Heading>
+              <Banner severity="info" title="Quick Configure">
+                <Text>Paste your gas card context from testnet.prepaidgas.xyz</Text>
+              </Banner>
+              <Form name="addCouponForm">
+                <Field label="Gas Card Context">
+                  <Input
+                    name="couponCode"
+                    placeholder="Paste your complete gas card context here..."
+                  />
+                </Field>
+                <Field label="Label (Optional)">
+                  <Input name="label" placeholder="e.g., My Gas Card" />
+                </Field>
+                <Button type="submit" name="submit">
+                  Configure
+                </Button>
+              </Form>
+            </Box>
+          ),
+          context: { action: 'addCoupon', origin },
+        },
+      });
 
-      if (!result) {
-        return { success: false, message: 'User cancelled' };
-      }
+      const result = await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          id: interfaceId,
+        },
+      });
 
-      return { success: true, coupon: result };
+      return { success: true, result };
     }
 
     case 'showCouponsList': {
@@ -1083,4 +1115,107 @@ export const onHomePage: OnHomePageHandler = async () => {
       </Box>
     ),
   };
+};
+
+// ============================================================================
+// User Input Handler (for Interactive UI)
+// ============================================================================
+
+/**
+ * Handle user input from interactive forms
+ * This is called when users interact with Form/Button/Input components
+ */
+export const onUserInput: OnUserInputHandler = async ({ id, event, context }) => {
+  console.log('User input received:', event);
+
+  // Handle form submission
+  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponForm') {
+    const formData = event.value as {
+      couponCode: string;
+      label: string;
+    };
+
+    try {
+      // Parse the coupon code
+      let paymasterContext = '';
+      let paymasterAddress = '';
+      let poolType: 'multi-use' | 'single-use' | 'cache-enabled' = 'multi-use';
+      let network = 'sepolia';
+      let chainId = '11155111';
+
+      try {
+        const parsed = JSON.parse(formData.couponCode);
+        paymasterContext = parsed.paymasterContext || parsed.context;
+        paymasterAddress = parsed.paymasterAddress || parsed.address;
+        poolType = parsed.poolType || 'multi-use';
+        network = parsed.network || 'sepolia';
+        chainId = parsed.chainId || '11155111';
+      } catch {
+        // If not JSON, assume it's just the context
+        paymasterContext = formData.couponCode;
+        paymasterAddress = '0x0000000000000000000000000000000000000000'; // Placeholder
+      }
+
+      // Add the coupon
+      const newCoupon = await addCoupon({
+        paymasterContext,
+        paymasterAddress,
+        poolType,
+        chainId,
+        network,
+        label: formData.label || undefined,
+      });
+
+      // Update UI to show success
+      await snap.request({
+        method: 'snap_updateInterface',
+        params: {
+          id,
+          ui: (
+            <Box>
+              <Banner severity="success" title="✓ Coupon Added Successfully!">
+                <Text>Your prepaid gas coupon is ready to use</Text>
+              </Banner>
+              <Divider />
+              <Section>
+                <Row label="Coupon ID">
+                  <Value value={newCoupon.id} />
+                </Row>
+                <Row label="Label">
+                  <Value value={newCoupon.label || 'No label'} />
+                </Row>
+                <Row label="Type">
+                  <Value value={newCoupon.poolType} />
+                </Row>
+                <Row label="Network">
+                  <Value value={newCoupon.network} />
+                </Row>
+              </Section>
+              <Divider />
+              <Text>You can now use this coupon for gasless transactions!</Text>
+            </Box>
+          ),
+        },
+      });
+    } catch (error) {
+      // Update UI to show error
+      await snap.request({
+        method: 'snap_updateInterface',
+        params: {
+          id,
+          ui: (
+            <Box>
+              <Banner severity="danger" title="Error Adding Coupon">
+                <Text>
+                  {error instanceof Error ? error.message : 'Unknown error occurred'}
+                </Text>
+              </Banner>
+              <Divider />
+              <Text>Please check your coupon code and try again.</Text>
+            </Box>
+          ),
+        },
+      });
+    }
+  }
 };
