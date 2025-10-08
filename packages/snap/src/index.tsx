@@ -1149,7 +1149,10 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   console.log('📥 User input received:', { id, event });
 
   // Handle form submission from home page
-  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponFormHome') {
+  if (
+    event.type === 'FormSubmitEvent' &&
+    event.name === 'addCouponFormHome'
+  ) {
     const formData = event.value as Record<string, string>;
     const couponCode = formData.couponCode || '';
     const label = formData.label || '';
@@ -1205,19 +1208,19 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         network = parsed.network || 'sepolia';
         chainId = parsed.chainId || '11155111';
       } catch (parseError) {
-        // If not JSON, check if it's hex-encoded paymasterAndData from testnet.prepaidgas.xyz
+        // If not JSON, check if it's hex-encoded paymasterAndData
         console.log('⚠️ Not JSON, parsing as hex data');
-        
+
         if (couponCode.startsWith('0x') && couponCode.length >= 42) {
-          // Extract paymaster address from hex data (first 20 bytes after 0x)
-          paymasterAddress = '0x' + couponCode.slice(26, 66); // Bytes 12-32
+          // Extract paymaster address from hex (first 20 bytes after 0x)
+          paymasterAddress = '0x' + couponCode.slice(26, 66);
           paymasterContext = couponCode; // Use full hex as context
           console.log('✓ Extracted from hex - Address:', paymasterAddress);
         } else {
-          // Fallback: treat as raw context
+          // Fallback
           console.log('Using as raw paymaster context');
           paymasterContext = couponCode;
-          paymasterAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'; // Default paymaster
+          paymasterAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb';
         }
       }
 
@@ -1263,15 +1266,13 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
                 </Row>
               </Section>
               <Divider />
-              <Text>
-                Close and reopen this page to see your coupon in the list!
-              </Text>
+              <Text>Close and reopen this page to see your coupon!</Text>
             </Box>
           ),
         },
       });
     } catch (error) {
-      console.error('Error adding coupon:', error);
+      console.error('❌ Error adding coupon:', error);
       await snap.request({
         method: 'snap_updateInterface',
         params: {
@@ -1280,13 +1281,11 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             <Box>
               <Banner severity="danger" title="Error">
                 <Text>
-                  {error instanceof Error
-                    ? error.message
-                    : 'Failed to add coupon'}
+                  {error instanceof Error ? error.message : 'Failed to add coupon'}
                 </Text>
               </Banner>
               <Divider />
-              <Text>Please check your coupon code format and try again</Text>
+              <Text>Please check your coupon code and try again</Text>
             </Box>
           ),
         },
