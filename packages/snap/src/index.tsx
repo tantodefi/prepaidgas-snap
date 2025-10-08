@@ -1149,10 +1149,7 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   console.log('📥 User input received:', { id, event });
 
   // Handle form submission from home page
-  if (
-    event.type === 'FormSubmitEvent' &&
-    event.name === 'addCouponFormHome'
-  ) {
+  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponFormHome') {
     const formData = event.value as Record<string, string>;
     const couponCode = formData.couponCode || '';
     const label = formData.label || '';
@@ -1243,30 +1240,28 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
 
       console.log('✓ Coupon added successfully:', newCoupon.id);
 
-      // Update UI to show success
+      // Update UI to show success (simplified to avoid type errors)
       await snap.request({
         method: 'snap_updateInterface',
         params: {
           id,
           ui: (
             <Box>
-              <Banner severity="success" title="✓ Coupon Added!">
-                <Text>{newCoupon.label || newCoupon.id} is ready to use</Text>
+              <Banner severity="success" title="✓ Coupon Added Successfully!">
+                <Text>Your prepaid gas coupon has been configured</Text>
               </Banner>
               <Divider />
-              <Section>
-                <Row label="Coupon ID">
-                  <Value value={newCoupon.id} />
-                </Row>
-                <Row label="Type">
-                  <Value value={newCoupon.poolType} />
-                </Row>
-                <Row label="Network">
-                  <Value value={newCoupon.network} />
-                </Row>
-              </Section>
+              <Text>
+                <Bold>Coupon ID:</Bold> {newCoupon.id}
+              </Text>
+              <Text>
+                <Bold>Type:</Bold> {newCoupon.poolType}
+              </Text>
+              <Text>
+                <Bold>Network:</Bold> {newCoupon.network}
+              </Text>
               <Divider />
-              <Text>Close and reopen this page to see your coupon!</Text>
+              <Text>✓ Close and reopen this page to see your coupon in the list!</Text>
             </Box>
           ),
         },
@@ -1281,7 +1276,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             <Box>
               <Banner severity="danger" title="Error">
                 <Text>
-                  {error instanceof Error ? error.message : 'Failed to add coupon'}
+                  {error instanceof Error
+                    ? error.message
+                    : 'Failed to add coupon'}
                 </Text>
               </Banner>
               <Divider />
