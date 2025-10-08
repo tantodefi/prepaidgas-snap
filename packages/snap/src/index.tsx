@@ -1205,10 +1205,20 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         network = parsed.network || 'sepolia';
         chainId = parsed.chainId || '11155111';
       } catch (parseError) {
-        // If not JSON, assume it's just the context
-        console.log('⚠️ Not JSON, using as raw context');
-        paymasterContext = couponCode;
-        paymasterAddress = '0x0000000000000000000000000000000000000000';
+        // If not JSON, check if it's hex-encoded paymasterAndData from testnet.prepaidgas.xyz
+        console.log('⚠️ Not JSON, parsing as hex data');
+        
+        if (couponCode.startsWith('0x') && couponCode.length >= 42) {
+          // Extract paymaster address from hex data (first 20 bytes after 0x)
+          paymasterAddress = '0x' + couponCode.slice(26, 66); // Bytes 12-32
+          paymasterContext = couponCode; // Use full hex as context
+          console.log('✓ Extracted from hex - Address:', paymasterAddress);
+        } else {
+          // Fallback: treat as raw context
+          console.log('Using as raw paymaster context');
+          paymasterContext = couponCode;
+          paymasterAddress = '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb'; // Default paymaster
+        }
       }
 
       console.log('Attempting to add coupon with:', {
