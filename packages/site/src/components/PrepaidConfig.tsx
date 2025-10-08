@@ -5,6 +5,7 @@ import { Input, Label, FormGroup, Select } from './ui/Input';
 import { Card } from './Card';
 import { CounterDemo } from './CounterDemo';
 import { usePrepaidSnap } from '../hooks/usePrepaidSnap';
+import { defaultSnapOrigin } from '../config';
 
 const ConfigContainer = styled.div`
   max-width: 500px;
@@ -233,6 +234,30 @@ export const PrepaidConfig = () => {
           <span>❌</span>
           <span>{error}</span>
         </StatusIndicator>
+      )}
+
+      {/* Quick Add via Snap Dialog Button */}
+      {coupons.length === 0 && (
+        <Button
+          onClick={async () => {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_invokeSnap',
+                params: {
+                  snapId: defaultSnapOrigin,
+                  request: { method: 'showAddCouponForm' },
+                },
+              });
+              await loadCoupons();
+            } catch (err) {
+              console.error('Failed to show snap form:', err);
+            }
+          }}
+          fullWidth
+          style={{ marginBottom: '1rem' }}
+        >
+          ✨ Add Coupon in MetaMask
+        </Button>
       )}
 
       {/* Add Coupon Form - Show by default if no coupons */}

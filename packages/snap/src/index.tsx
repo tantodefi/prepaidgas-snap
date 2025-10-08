@@ -915,7 +915,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
             <Box>
               <Heading>Add Prepaid Gas Coupon</Heading>
               <Banner severity="info" title="Quick Configure">
-                <Text>Paste your gas card context from testnet.prepaidgas.xyz</Text>
+                <Text>
+                  Paste your gas card context from testnet.prepaidgas.xyz
+                </Text>
               </Banner>
               <Form name="addCouponForm">
                 <Field label="Gas Card Context">
@@ -1037,7 +1039,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 // ============================================================================
 
 /**
- * Show the snap's home page in MetaMask
+ * Show the snap's home page in MetaMask with interactive form
  * Users can access this from: MetaMask → Snaps → Prepaid Gas Manager → View
  */
 export const onHomePage: OnHomePageHandler = async () => {
@@ -1086,29 +1088,53 @@ export const onHomePage: OnHomePageHandler = async () => {
               </Box>
             ))}
 
-            <Banner severity="info" title="How to Use">
-              <Text>
-                Connect from a dapp to use your coupons for gasless transactions
-              </Text>
-            </Banner>
+            <Divider />
+            <Text>
+              <Bold>Add Another Coupon:</Bold>
+            </Text>
+            <Form name="addCouponFormHome">
+              <Field label="Gas Card Context">
+                <Input
+                  name="couponCode"
+                  placeholder="Paste your gas card context here..."
+                />
+              </Field>
+              <Field label="Label (Optional)">
+                <Input name="label" placeholder="e.g., My Second Card" />
+              </Field>
+              <Button type="submit" name="addAnother">
+                + Add Another Coupon
+              </Button>
+            </Form>
           </Box>
         ) : (
           <Box>
-            <Banner severity="warning" title="No Coupons Yet">
+            <Banner severity="info" title="Welcome to Prepaid Gas Manager!">
               <Text>
-                Visit testnet.prepaidgas.xyz to purchase prepaid gas credits
+                Add your prepaid gas coupons here to enable gasless transactions
               </Text>
             </Banner>
             <Divider />
             <Text>
-              <Bold>Getting Started:</Bold>
+              <Bold>Add Your First Coupon:</Bold>
             </Text>
-            <Text>1. Purchase gas credits on testnet.prepaidgas.xyz</Text>
-            <Text>2. Copy your gas card context</Text>
-            <Text>3. Add it via the companion site or dapp</Text>
+            <Form name="addCouponFormHome">
+              <Field label="Gas Card Context">
+                <Input
+                  name="couponCode"
+                  placeholder="Paste your complete gas card context here..."
+                />
+              </Field>
+              <Field label="Label (Optional)">
+                <Input name="label" placeholder="e.g., My Gas Card" />
+              </Field>
+              <Button type="submit" name="addFirst">
+                Configure Paymaster
+              </Button>
+            </Form>
             <Divider />
-            <Text>
-              Visit: https://site-cqrq0u4d3-tantodefis-projects.vercel.app
+            <Text color="muted">
+              Get gas credits from testnet.prepaidgas.xyz
             </Text>
           </Box>
         )}
@@ -1125,11 +1151,19 @@ export const onHomePage: OnHomePageHandler = async () => {
  * Handle user input from interactive forms
  * This is called when users interact with Form/Button/Input components
  */
-export const onUserInput: OnUserInputHandler = async ({ id, event, context }) => {
+export const onUserInput: OnUserInputHandler = async ({
+  id,
+  event,
+  context,
+}) => {
   console.log('User input received:', event);
 
-  // Handle form submission
-  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponForm') {
+  // Handle form submission from add coupon dialog
+  if (
+    event.type === 'FormSubmitEvent' &&
+    (event.name === 'addCouponForm' ||
+      event.name === 'addCouponFormHome')
+  ) {
     const formData = event.value as {
       couponCode: string;
       label: string;
@@ -1207,7 +1241,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event, context }) =>
             <Box>
               <Banner severity="danger" title="Error Adding Coupon">
                 <Text>
-                  {error instanceof Error ? error.message : 'Unknown error occurred'}
+                  {error instanceof Error
+                    ? error.message
+                    : 'Unknown error occurred'}
                 </Text>
               </Banner>
               <Divider />
