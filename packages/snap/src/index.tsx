@@ -1106,27 +1106,14 @@ export const onHomePage: OnHomePageHandler = async () => {
           <Box>
             <Divider />
             <Text>
-              <Bold>Your Coupons:</Bold>
+              <Bold>Your Coupons ({coupons.length}):</Bold>
             </Text>
-            {coupons.map((coupon) => (
-              <Box key={coupon.id}>
-                <Section>
-                  <Heading>{coupon.label || coupon.id}</Heading>
-                  <Row label="Type">
-                    <Value value={coupon.poolType} />
-                  </Row>
-                  <Row label="Network">
-                    <Value value={coupon.network} />
-                  </Row>
-                  <Row label="Paymaster">
-                    <Value
-                      value={`${coupon.paymasterAddress.slice(0, 6)}...${coupon.paymasterAddress.slice(-4)}`}
-                    />
-                  </Row>
-                </Section>
-                <Divider />
-              </Box>
-            ))}
+            <Text>• {coupons[0]?.label || coupons[0]?.id}</Text>
+            <Text>  Type: {coupons[0]?.poolType}</Text>
+            <Text>  Network: {coupons[0]?.network}</Text>
+            {coupons.length > 1 && (
+              <Text>... and {coupons.length - 1} more</Text>
+            )}
           </Box>
         )}
 
@@ -1261,7 +1248,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
                 <Bold>Network:</Bold> {newCoupon.network}
               </Text>
               <Divider />
-              <Text>✓ Close and reopen this page to see your coupon in the list!</Text>
+              <Text>
+                ✓ Close and reopen this page to see your coupon in the list!
+              </Text>
             </Box>
           ),
         },
