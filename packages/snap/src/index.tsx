@@ -1198,16 +1198,25 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
 
       try {
         const parsed = JSON.parse(couponCode);
+        console.log('✓ Parsed JSON:', parsed);
         paymasterContext = parsed.paymasterContext || parsed.context;
         paymasterAddress = parsed.paymasterAddress || parsed.address;
         poolType = parsed.poolType || 'multi-use';
         network = parsed.network || 'sepolia';
         chainId = parsed.chainId || '11155111';
-      } catch {
+      } catch (parseError) {
         // If not JSON, assume it's just the context
+        console.log('⚠️ Not JSON, using as raw context');
         paymasterContext = couponCode;
         paymasterAddress = '0x0000000000000000000000000000000000000000';
       }
+
+      console.log('Attempting to add coupon with:', {
+        paymasterContext: paymasterContext.slice(0, 20) + '...',
+        paymasterAddress,
+        poolType,
+        network,
+      });
 
       // Add the coupon
       const newCoupon = await addCoupon({
@@ -1218,6 +1227,8 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
         network,
         label: label || undefined,
       });
+
+      console.log('✓ Coupon added successfully:', newCoupon.id);
 
       // Update UI to show success
       await snap.request({
@@ -1242,7 +1253,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
                 </Row>
               </Section>
               <Divider />
-              <Text>Close and reopen this page to see your coupon in the list!</Text>
+              <Text>
+                Close and reopen this page to see your coupon in the list!
+              </Text>
             </Box>
           ),
         },
@@ -1257,7 +1270,9 @@ export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
             <Box>
               <Banner severity="danger" title="Error">
                 <Text>
-                  {error instanceof Error ? error.message : 'Failed to add coupon'}
+                  {error instanceof Error
+                    ? error.message
+                    : 'Failed to add coupon'}
                 </Text>
               </Banner>
               <Divider />
