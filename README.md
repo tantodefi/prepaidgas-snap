@@ -753,6 +753,7 @@ Now users can just visit your Vercel site and the snap installs from npm!
 ### Current State: Simulation
 
 The counter demo **currently simulates transactions** - it:
+
 - ✅ Gets paymaster data from snap
 - ✅ Shows transaction flow
 - ✅ Increments counter (local state)
@@ -763,6 +764,7 @@ The counter demo **currently simulates transactions** - it:
 The demo at https://demo.prepaidgas.xyz uses a real counter contract. To connect to it:
 
 **1. Find your counter contract details:**
+
 - Contract address (e.g., from demo.prepaidgas.xyz)
 - Contract ABI
 - Network/chain ID
@@ -776,7 +778,9 @@ Replace the TODO section (lines 148-186) with:
 import { ethers } from 'ethers';
 
 const COUNTER_ADDRESS = '0x...'; // Your deployed counter
-const COUNTER_ABI = [ /* Your ABI */ ];
+const COUNTER_ABI = [
+  /* Your ABI */
+];
 
 // In handleIncrement function:
 const provider = new ethers.BrowserProvider(window.ethereum);
@@ -785,7 +789,7 @@ const signer = await provider.getSigner();
 const counterContract = new ethers.Contract(
   COUNTER_ADDRESS,
   COUNTER_ABI,
-  signer
+  signer,
 );
 
 // Send transaction with paymaster
@@ -817,11 +821,13 @@ Match the chainId in your coupons to your counter contract's network.
 ### State: On-Chain vs Local
 
 **Simulated (current):**
+
 - Counter resets on page refresh
 - No gas used
 - No blockchain interaction
 
 **Real contract (after implementing above):**
+
 - Counter persists on-chain
 - Uses prepaid gas via paymaster
 - Can be read by anyone

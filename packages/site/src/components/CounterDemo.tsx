@@ -147,29 +147,29 @@ export const CounterDemo = ({
 
       /*
        * TODO: Replace simulation with actual smart contract call
-       * 
+       *
        * Example with ethers.js and your counter contract:
-       * 
+       *
        * const provider = new ethers.BrowserProvider(window.ethereum);
        * const signer = await provider.getSigner();
-       * 
+       *
        * const counterContract = new ethers.Contract(
        *   COUNTER_ADDRESS, // Your deployed counter contract
        *   COUNTER_ABI,     // Counter ABI
        *   signer
        * );
-       * 
+       *
        * // Construct transaction with paymaster data
        * const tx = await counterContract.increment({
        *   // Add paymaster fields based on your implementation:
        *   // For ERC-4337: paymasterAndData
        *   // For your custom: use paymasterData.paymasterContext
        * });
-       * 
+       *
        * addLog(`📤 Transaction sent: ${tx.hash}`);
        * await tx.wait();
        * addLog('✅ Transaction confirmed!');
-       * 
+       *
        * // Read the new counter value from chain
        * const newCount = await counterContract.count();
        * setCount(Number(newCount));

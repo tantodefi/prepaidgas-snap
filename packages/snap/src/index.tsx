@@ -7,6 +7,15 @@ import {
   Heading,
   Divider,
   Copyable,
+  Form,
+  Field,
+  Button,
+  Banner,
+  Row,
+  Value,
+  Section,
+  Dropdown,
+  Option,
 } from '@metamask/snaps-sdk/jsx';
 
 // ============================================================================
@@ -239,7 +248,7 @@ async function getPaymasterCallData(
 // ============================================================================
 
 /**
- * Show the add coupon dialog
+ * Show the add coupon dialog (simple single input)
  */
 async function showAddCouponDialog(origin: string): Promise<string | null> {
   const result = await snap.request({
@@ -267,7 +276,298 @@ async function showAddCouponDialog(origin: string): Promise<string | null> {
 }
 
 /**
- * Show coupon details dialog
+ * Show enhanced multi-step form for adding coupon
+ * Uses advanced MetaMask Snap UI components per docs.metamask.io/snaps/features/custom-ui
+ */
+async function showAddCouponFormDialog(
+  origin: string,
+): Promise<PrepaidCoupon | null> {
+  // Step 1: Choose mode with Banner
+  const mode = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: (
+        <Box>
+          <Heading>Add Prepaid Gas Coupon</Heading>
+          <Banner severity="info" title="Configure Your Paymaster">
+            <Text>Choose how to add your gas card from {origin}</Text>
+          </Banner>
+          <Divider />
+          <Section>
+            <Row label="Quick Mode">
+              <Text>Paste complete gas card context</Text>
+            </Row>
+            <Row label="Manual Mode">
+              <Text>Enter each field individually</Text>
+            </Row>
+          </Section>
+          <Divider />
+          <Text>
+            <Bold>Approve</Bold> = Quick Mode (Recommended) • <Bold>Reject</Bold> =
+            Manual Mode
+          </Text>
+        </Box>
+      ),
+    },
+  });
+
+  // Quick mode - just paste the code
+  if (mode) {
+    const couponCode = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'prompt',
+        content: (
+          <Box>
+            <Heading>📋 Paste Gas Card Context</Heading>
+            <Banner severity="info" title="Quick Configure">
+              <Text>
+                Paste the complete code from your testnet.prepaidgas.xyz receipt
+              </Text>
+            </Banner>
+            <Divider />
+            <Text>
+              The code includes your paymaster address, context, and pool details.
+            </Text>
+          </Box>
+        ),
+        placeholder: 'Paste gas card context here...',
+      },
+    });
+
+    if (!couponCode) return null;
+
+    // Try to parse it
+    try {
+      const parsed = JSON.parse(couponCode);
+
+      // Ask for optional label
+      const label = await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'prompt',
+          content: (
+            <Box>
+              <Heading>Label Your Coupon</Heading>
+              <Text>Give this coupon a friendly name (optional)</Text>
+            </Box>
+          ),
+          placeholder: 'e.g., My Gas Card',
+        },
+      });
+
+      const newCoupon = await addCoupon({
+        paymasterContext: parsed.paymasterContext || parsed.context,
+        paymasterAddress: parsed.paymasterAddress || parsed.address,
+        poolType: parsed.poolType || 'multi-use',
+        chainId: parsed.chainId || '11155111',
+        network: parsed.network || 'sepolia',
+        label: label || undefined,
+      });
+
+      // Show success banner with details
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: (
+            <Box>
+              <Banner severity="success" title="✓ Coupon Added Successfully!">
+                <Text>Your prepaid gas coupon is ready to use</Text>
+              </Banner>
+              <Divider />
+              <Section>
+                <Row label="Coupon ID">
+                  <Value value={newCoupon.id} />
+                </Row>
+                <Row label="Type">
+                  <Value value={newCoupon.poolType} />
+                </Row>
+                <Row label="Network">
+                  <Value value={newCoupon.network} />
+                </Row>
+              </Section>
+            </Box>
+          ),
+        },
+      });
+
+      return newCoupon;
+    } catch {
+      // If parsing fails
+      await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'alert',
+          content: (
+            <Box>
+              <Banner severity="warning" title="Unable to Parse">
+                <Text>
+                  Could not parse the coupon code. Please try manual mode or
+                  check the format.
+                </Text>
+              </Banner>
+            </Box>
+          ),
+        },
+      });
+      return null;
+    }
+  }
+
+  // Manual mode - step by step with progress indicators
+  const paymasterContext = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: (
+        <Box>
+          <Heading>⚙️ Manual Configuration</Heading>
+          <Text>
+            <Bold>Step 1 of 5:</Bold> Paymaster Context
+          </Text>
+          <Divider />
+          <Text>Enter the paymaster context (hex or base64 encoded string)</Text>
+        </Box>
+      ),
+      placeholder: '0x...',
+    },
+  });
+
+  if (!paymasterContext) return null;
+
+  const paymasterAddress = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: (
+        <Box>
+          <Heading>⚙️ Manual Configuration</Heading>
+          <Text>
+            <Bold>Step 2 of 5:</Bold> Paymaster Address
+          </Text>
+          <Divider />
+          <Text>Enter the paymaster contract address</Text>
+        </Box>
+      ),
+      placeholder: '0x...',
+    },
+  });
+
+  if (!paymasterAddress) return null;
+
+  // Pool type - with visual explanation
+  const isMultiUse = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'confirmation',
+      content: (
+        <Box>
+          <Heading>⚙️ Manual Configuration</Heading>
+          <Text>
+            <Bold>Step 3 of 5:</Bold> Pool Type
+          </Text>
+          <Divider />
+          <Section>
+            <Row label="Multi-Use">
+              <Text>Use for multiple transactions</Text>
+            </Row>
+            <Row label="Single-Use">
+              <Text>One-time voucher</Text>
+            </Row>
+          </Section>
+          <Divider />
+          <Text>
+            <Bold>Approve</Bold> = Multi-Use • <Bold>Reject</Bold> = Single-Use
+          </Text>
+        </Box>
+      ),
+    },
+  });
+
+  const network = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: (
+        <Box>
+          <Heading>⚙️ Manual Configuration</Heading>
+          <Text>
+            <Bold>Step 4 of 5:</Bold> Network
+          </Text>
+          <Divider />
+          <Text>Enter the network name (e.g., sepolia, mainnet)</Text>
+        </Box>
+      ),
+      placeholder: 'sepolia',
+    },
+  });
+
+  const label = await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'prompt',
+      content: (
+        <Box>
+          <Heading>⚙️ Manual Configuration</Heading>
+          <Text>
+            <Bold>Step 5 of 5:</Bold> Label (Optional)
+          </Text>
+          <Divider />
+          <Text>Give this coupon a friendly name for easy identification</Text>
+        </Box>
+      ),
+      placeholder: 'My Gas Card',
+    },
+  });
+
+  const newCoupon = await addCoupon({
+    paymasterContext,
+    paymasterAddress,
+    poolType: isMultiUse ? 'multi-use' : 'single-use',
+    chainId: '11155111',
+    network: network || 'sepolia',
+    label: label || undefined,
+  });
+
+  // Show success with detailed info
+  await snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: (
+        <Box>
+          <Banner severity="success" title="✓ Coupon Added Successfully!">
+            <Text>Your prepaid gas coupon is ready to use</Text>
+          </Banner>
+          <Divider />
+          <Section>
+            <Row label="Coupon ID">
+              <Value value={newCoupon.id} />
+            </Row>
+            <Row label="Type">
+              <Value value={newCoupon.poolType} />
+            </Row>
+            <Row label="Network">
+              <Value value={newCoupon.network} />
+            </Row>
+            <Row label="Paymaster">
+              <Value
+                value={`${newCoupon.paymasterAddress.slice(0, 6)}...${newCoupon.paymasterAddress.slice(-4)}`}
+              />
+            </Row>
+          </Section>
+        </Box>
+      ),
+    },
+  });
+
+  return newCoupon;
+}
+
+/**
+ * Show coupon details dialog with enhanced UI
  */
 async function showCouponDetailsDialog(coupon: PrepaidCoupon): Promise<void> {
   await snap.request({
@@ -276,38 +576,36 @@ async function showCouponDetailsDialog(coupon: PrepaidCoupon): Promise<void> {
       type: 'alert',
       content: (
         <Box>
-          <Heading>Prepaid Gas Coupon</Heading>
+          <Heading>💳 {coupon.label || 'Prepaid Gas Coupon'}</Heading>
+          <Divider />
+          
+          <Section>
+            <Row label="Coupon ID">
+              <Value value={coupon.id} />
+            </Row>
+            <Row label="Pool Type">
+              <Value value={coupon.poolType} />
+            </Row>
+            <Row label="Network">
+              <Value value={coupon.network} />
+            </Row>
+            <Row label="Chain ID">
+              <Value value={coupon.chainId} />
+            </Row>
+          </Section>
+
           <Divider />
 
           <Text>
-            <Bold>ID:</Bold>
-          </Text>
-          <Text>{coupon.id}</Text>
-
-          <Divider />
-
-          <Text>
-            <Bold>Type:</Bold> {coupon.poolType}
-          </Text>
-          <Text>
-            <Bold>Network:</Bold> {coupon.network}
-          </Text>
-          <Text>
-            <Bold>Chain ID:</Bold> {coupon.chainId}
-          </Text>
-
-          <Divider />
-
-          <Text>
-            <Bold>Paymaster Address:</Bold>
+            <Bold>Paymaster Contract</Bold>
           </Text>
           <Copyable value={coupon.paymasterAddress} />
 
           <Divider />
 
-          <Text>
-            <Bold>Added:</Bold> {new Date(coupon.addedAt).toLocaleDateString()}
-          </Text>
+          <Row label="Added">
+            <Text>{new Date(coupon.addedAt).toLocaleDateString()}</Text>
+          </Row>
         </Box>
       ),
     },
@@ -315,7 +613,7 @@ async function showCouponDetailsDialog(coupon: PrepaidCoupon): Promise<void> {
 }
 
 /**
- * Show list of all coupons
+ * Show list of all coupons with enhanced UI
  */
 async function showCouponsListDialog(): Promise<void> {
   const coupons = await listCoupons();
@@ -328,12 +626,12 @@ async function showCouponsListDialog(): Promise<void> {
         content: (
           <Box>
             <Heading>Your Prepaid Gas Coupons</Heading>
-            <Divider />
-            <Text>You don't have any coupons yet.</Text>
-            <Text>
-              Get prepaid gas credits from testnet.prepaidgas.xyz and add them
-              here!
-            </Text>
+            <Banner severity="warning" title="No Coupons Yet">
+              <Text>
+                Get prepaid gas credits from testnet.prepaidgas.xyz and add them
+                here!
+              </Text>
+            </Banner>
           </Box>
         ),
       },
@@ -343,18 +641,25 @@ async function showCouponsListDialog(): Promise<void> {
 
   const content = (
     <Box>
-      <Heading>Your Prepaid Gas Coupons ({coupons.length})</Heading>
+      <Heading>💳 Your Gas Coupons</Heading>
+      <Banner severity="success" title={`${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`}>
+        <Text>Manage your prepaid gas credits below</Text>
+      </Banner>
       <Divider />
       {coupons.map((coupon) => (
         <>
-          <Box>
-            <Text>
-              <Bold>{coupon.label || coupon.id}</Bold>
-            </Text>
-            <Text>Type: {coupon.poolType}</Text>
-            <Text>Network: {coupon.network}</Text>
-            <Text>Added: {new Date(coupon.addedAt).toLocaleDateString()}</Text>
-          </Box>
+          <Section>
+            <Heading>{coupon.label || coupon.id}</Heading>
+            <Row label="Type">
+              <Value value={coupon.poolType} />
+            </Row>
+            <Row label="Network">
+              <Value value={coupon.network} />
+            </Row>
+            <Row label="Added">
+              <Value value={new Date(coupon.addedAt).toLocaleDateString()} />
+            </Row>
+          </Section>
           <Divider />
         </>
       ))}
@@ -399,7 +704,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case 'addCoupon': {
       const params = request.params as AddCouponParams;
 
-      // Show confirmation dialog
+      // Show confirmation dialog with enhanced UI
       const confirmed = await snap.request({
         method: 'snap_dialog',
         params: {
@@ -407,21 +712,31 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           content: (
             <Box>
               <Heading>Add Prepaid Gas Coupon</Heading>
-              <Text>
-                <Bold>{origin}</Bold> wants to add a prepaid gas coupon.
-              </Text>
+              <Banner severity="info" title="Permission Request">
+                <Text>
+                  <Bold>{origin}</Bold> wants to add a prepaid gas coupon
+                </Text>
+              </Banner>
               <Divider />
-              <Text>
-                <Bold>Network:</Bold> {params.network || 'Unknown'}
-              </Text>
-              <Text>
-                <Bold>Type:</Bold> {params.poolType}
-              </Text>
+              <Section>
+                <Row label="Network">
+                  <Value value={params.network || 'Unknown'} />
+                </Row>
+                <Row label="Pool Type">
+                  <Value value={params.poolType} />
+                </Row>
+                <Row label="Paymaster">
+                  <Value
+                    value={`${params.paymasterAddress.slice(0, 6)}...${params.paymasterAddress.slice(-4)}`}
+                  />
+                </Row>
+              </Section>
               <Divider />
-              <Text>
-                This will allow the dapp to use your prepaid gas credits for
-                gasless transactions.
-              </Text>
+              <Banner severity="warning" title="Enable Gasless Transactions">
+                <Text>
+                  This will allow the dapp to use your prepaid gas credits.
+                </Text>
+              </Banner>
             </Box>
           ),
         },
@@ -516,23 +831,42 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
     case 'getPaymasterCallData': {
       const { couponId } = request.params as GetCouponParams;
+      const coupon = await getCoupon(couponId);
 
-      // Show confirmation dialog for security
+      if (!coupon) {
+        throw new Error('Coupon not found');
+      }
+
+      // Show confirmation dialog with coupon details
       const confirmed = await snap.request({
         method: 'snap_dialog',
         params: {
           type: 'confirmation',
           content: (
             <Box>
-              <Heading>Use Prepaid Gas</Heading>
-              <Text>
-                <Bold>{origin}</Bold> wants to use your prepaid gas coupon for a
-                transaction.
-              </Text>
+              <Heading>💸 Use Prepaid Gas</Heading>
+              <Banner severity="info" title="Transaction Request">
+                <Text>
+                  <Bold>{origin}</Bold> wants to use your prepaid gas for a
+                  gasless transaction
+                </Text>
+              </Banner>
+              <Divider />
+              <Section>
+                <Row label="Using Coupon">
+                  <Value value={coupon.label || coupon.id} />
+                </Row>
+                <Row label="Pool Type">
+                  <Value value={coupon.poolType} />
+                </Row>
+                <Row label="Network">
+                  <Value value={coupon.network} />
+                </Row>
+              </Section>
               <Divider />
               <Text>
-                This will provide the paymaster data to enable gasless
-                transactions.
+                This will provide your paymaster context to enable the gasless
+                transaction.
               </Text>
             </Box>
           ),
@@ -560,6 +894,17 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       // TODO: Parse the coupon code and extract necessary data
       // For now, return the raw code for the dapp to handle
       return { success: true, couponCode };
+    }
+
+    case 'showAddCouponForm': {
+      // Multi-step form using snap dialogs
+      const result = await showAddCouponFormDialog(origin);
+
+      if (!result) {
+        return { success: false, message: 'User cancelled' };
+      }
+
+      return { success: true, coupon: result };
     }
 
     case 'showCouponsList': {
