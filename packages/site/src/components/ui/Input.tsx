@@ -62,3 +62,4 @@ export const Label = styled.label`
 export const FormGroup = styled.div`
   margin-bottom: 1.5rem;
 `;
+`;

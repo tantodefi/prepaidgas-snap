@@ -223,33 +223,49 @@ export const CounterDemo = ({
        * setCount(Number(newCount));
        */
 
-      if (USE_REAL_CONTRACT) {
-        // TODO: Implement real transaction with paymaster
-        // This requires integrating paymasterData.paymasterContext into the transaction
-        // The exact format depends on your paymaster implementation
-        addLog('🔧 Real contract integration coming soon');
-        addLog('💡 Paymaster data retrieved successfully');
-        addLog('⚠️ Set USE_REAL_CONTRACT=false for now (simulation mode)');
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        setCount((c) => c + 1);
-      } else {
-        // SIMULATION MODE (Safe default)
-        addLog('⏳ Simulating gasless transaction...');
-        addLog(
-          `📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`,
-        );
-        addLog('💡 Using simulation mode (USE_REAL_CONTRACT=false)');
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Send real transaction to counter contract
+      addLog('📋 Contract: ' + COUNTER_ADDRESS.slice(0, 10) + '...');
+      addLog('🔧 Encoding increment() call...');
 
-        // Simulate success
-        addLog('✅ Simulation successful!');
-        addLog('🎉 Counter incremented (local only)');
-        setCount((c) => c + 1);
+      // Encode the increment function call
+      const incrementData = '0xd09de08a'; // increment() function selector
 
-        // Refresh from chain after simulation
-        setTimeout(() => {
-          readCounterValue();
-        }, 500);
+      // Construct the transaction
+      const tx = {
+        to: COUNTER_ADDRESS,
+        data: incrementData,
+        value: '0x0', // No ETH value
+        from: window.ethereum.selectedAddress,
+        // Add the paymaster data - this is the key for gasless transactions
+        paymasterAndData: paymasterData.paymasterContext,
+      };
+
+      addLog('📤 Sending transaction with paymaster...');
+      addLog(`💰 Using paymaster: ${paymasterData.paymasterAddress.slice(0, 10)}...`);
+
+      try {
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [tx],
+        });
+
+        addLog(`✓ Transaction sent: ${txHash.slice(0, 10)}...`);
+        addLog('⏳ Waiting for confirmation...');
+
+        // Wait a bit for transaction to be mined
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+        addLog('✅ Transaction confirmed!');
+        addLog('🎉 Counter incremented on-chain!');
+
+        // Read new value from chain
+        setTimeout(async () => {
+          await readCounterValue();
+          addLog('🔄 Counter updated from chain');
+        }, 1000);
+      } catch (txError) {
+        addLog(`❌ Transaction error: ${txError instanceof Error ? txError.message : 'Unknown'}`);
+        throw txError;
       }
     } catch (error) {
       console.error('❌ Transaction failed:', error);
@@ -368,3 +384,4 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
+

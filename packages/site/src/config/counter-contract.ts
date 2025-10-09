@@ -52,6 +52,5 @@ export const COUNTER_NETWORK = 'base-sepolia';
 // RPC endpoint for Base Sepolia
 export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 
-// Enable real contract transactions (simulation only for now)
-// Set to true when you're ready to send real transactions
-export const USE_REAL_CONTRACT = false;
+// Enable real contract transactions
+export const USE_REAL_CONTRACT = true;
