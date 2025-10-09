@@ -1002,6 +1002,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return { success: true };
     }
 
+    case 'hasConfiguredCoupons': {
+      const allCoupons = await listCoupons();
+      return {
+        hasCoupons: allCoupons.length > 0,
+        count: allCoupons.length,
+      };
+    }
+
     // ========================================================================
     // Default/Legacy Methods
     // ========================================================================
