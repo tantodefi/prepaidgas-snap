@@ -866,13 +866,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               <Divider />
               <Section>
                 <Row label="Using Coupon">
-                  <Value value={coupon.label || coupon.id} />
+                  <Text>{coupon.label || coupon.id}</Text>
                 </Row>
                 <Row label="Pool Type">
-                  <Value value={coupon.poolType} />
+                  <Text>{coupon.poolType}</Text>
                 </Row>
                 <Row label="Network">
-                  <Value value={coupon.network} />
+                  <Text>{coupon.network}</Text>
                 </Row>
               </Section>
               <Divider />
