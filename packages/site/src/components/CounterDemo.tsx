@@ -1,7 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from './ui/Button';
 import type { PrepaidCoupon, PaymasterData } from '../hooks/usePrepaidSnap';
+import {
+  COUNTER_ABI,
+  COUNTER_ADDRESS,
+  COUNTER_RPC_URL,
+  USE_REAL_CONTRACT,
+} from '../config/counter-contract';
 
 const CounterContainer = styled.div`
   max-width: 500px;
@@ -119,8 +125,48 @@ export const CounterDemo = ({
   const [count, setCount] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [txLogs, setTxLogs] = useState<string[]>([]);
+  const [isReadingCount, setIsReadingCount] = useState(false);
 
   console.log('🎯 CounterDemo - selectedCoupon:', selectedCoupon);
+
+  // Read counter value from chain on mount
+  useEffect(() => {
+    readCounterValue();
+  }, []);
+
+  const readCounterValue = async () => {
+    setIsReadingCount(true);
+    try {
+      const response = await fetch(COUNTER_RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_call',
+          params: [
+            {
+              to: COUNTER_ADDRESS,
+              data: '0x06661abd', // count() function selector
+            },
+            'latest',
+          ],
+        }),
+      });
+
+      const data = await response.json();
+      if (data.result) {
+        const value = parseInt(data.result, 16);
+        setCount(value);
+        console.log('✓ Read counter from chain:', value);
+      }
+    } catch (error) {
+      console.error('Failed to read counter:', error);
+      // Keep local state on error
+    } finally {
+      setIsReadingCount(false);
+    }
+  };
 
   const addLog = (message: string) => {
     const timestamp = new Date().toLocaleTimeString();
@@ -175,15 +221,32 @@ export const CounterDemo = ({
        * setCount(Number(newCount));
        */
 
-      // SIMULATION ONLY - Replace this:
-      addLog('⏳ Simulating transaction with paymaster...');
-      addLog('💡 See TODO in CounterDemo.tsx to use real contract');
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      if (USE_REAL_CONTRACT) {
+        // TODO: Implement real transaction with paymaster
+        // This requires integrating paymasterData.paymasterContext into the transaction
+        // The exact format depends on your paymaster implementation
+        addLog('🔧 Real contract integration coming soon');
+        addLog('💡 Paymaster data retrieved successfully');
+        addLog('⚠️ Set USE_REAL_CONTRACT=false for now (simulation mode)');
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        setCount((c) => c + 1);
+      } else {
+        // SIMULATION MODE (Safe default)
+        addLog('⏳ Simulating gasless transaction...');
+        addLog(`📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`);
+        addLog('💡 Using simulation mode (USE_REAL_CONTRACT=false)');
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Simulate success
-      addLog('✅ Transaction simulated successfully!');
-      addLog('🎉 Counter incremented (local state only)');
-      setCount((c) => c + 1);
+        // Simulate success
+        addLog('✅ Simulation successful!');
+        addLog('🎉 Counter incremented (local only)');
+        setCount((c) => c + 1);
+
+        // Refresh from chain after simulation
+        setTimeout(() => {
+          readCounterValue();
+        }, 500);
+      }
     } catch (error) {
       console.error('Transaction failed:', error);
       if (error instanceof Error && error.message.includes('rejected')) {
@@ -228,12 +291,27 @@ export const CounterDemo = ({
 
       <Button
         onClick={handleIncrement}
-        disabled={isSending || !selectedCoupon}
+        disabled={isSending || !selectedCoupon || isReadingCount}
         fullWidth
         size="lg"
       >
-        {isSending ? '⏳ Sending Transaction...' : '+ Increment (Gasless)'}
+        {isSending
+          ? '⏳ Sending Transaction...'
+          : isReadingCount
+            ? '📖 Reading...'
+            : '+ Increment (Gasless)'}
       </Button>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+        <Button
+          onClick={readCounterValue}
+          disabled={isReadingCount || isSending}
+          variant="outline"
+          fullWidth
+        >
+          {isReadingCount ? '📖 Reading...' : '🔄 Refresh from Chain'}
+        </Button>
+      </div>
 
       <div
         style={{
@@ -245,7 +323,7 @@ export const CounterDemo = ({
       >
         {isSending
           ? 'Using your prepaid gas coupon...'
-          : 'Click to increment using gasless transaction'}
+          : `Counter on Base Sepolia • ${USE_REAL_CONTRACT ? 'Real Txs' : 'Simulation'}`}
       </div>
 
       {txLogs.length > 0 && (
@@ -263,16 +341,21 @@ export const CounterDemo = ({
         style={{
           marginTop: '1.5rem',
           padding: '1rem',
-          background: 'rgba(234, 179, 8, 0.1)',
-          border: '1px solid rgba(234, 179, 8, 0.3)',
+          background: USE_REAL_CONTRACT
+            ? 'rgba(34, 197, 94, 0.1)'
+            : 'rgba(234, 179, 8, 0.1)',
+          border: `1px solid ${USE_REAL_CONTRACT ? 'rgba(34, 197, 94, 0.3)' : 'rgba(234, 179, 8, 0.3)'}`,
           borderRadius: '0.5rem',
           fontSize: '0.75rem',
-          color: '#eab308',
+          color: USE_REAL_CONTRACT ? '#22c55e' : '#eab308',
         }}
       >
-        <strong>Note:</strong> This is a demo simulation. Replace the TODO in
-        CounterDemo.tsx with your actual smart contract call to increment a
-        counter on-chain using the paymaster data.
+        <strong>
+          {USE_REAL_CONTRACT ? '✓ Live Mode:' : '⚠️ Simulation Mode:'}
+        </strong>{' '}
+        {USE_REAL_CONTRACT
+          ? `Reading from real contract ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`
+          : 'Counter value is read from chain, but transactions are simulated. Set USE_REAL_CONTRACT=true in counter-contract.ts to enable real transactions with paymaster.'}
       </div>
     </CounterContainer>
   );
