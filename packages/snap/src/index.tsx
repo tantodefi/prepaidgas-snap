@@ -1054,34 +1054,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  */
 export const onHomePage: OnHomePageHandler = async () => {
   const coupons = await listCoupons();
-  const hasCoupons = coupons.length > 0;
-
-  // Build coupon list content
-  const couponListContent = hasCoupons ? (
-    <Box>
-      <Divider />
-      <Text>
-        <Bold>Your Coupons:</Bold>
-      </Text>
-      <Text>• {coupons[0].label || coupons[0].id}</Text>
-      <Text>
-        {' '}
-        {coupons[0].poolType} on {coupons[0].network}
-      </Text>
-      {coupons.length > 1 ? (
-        <Text>• {coupons[1].label || coupons[1].id}</Text>
-      ) : null}
-      {coupons.length > 1 ? (
-        <Text>
-          {' '}
-          {coupons[1].poolType} on {coupons[1].network}
-        </Text>
-      ) : null}
-      {coupons.length > 2 ? (
-        <Text>... and {coupons.length - 2} more</Text>
-      ) : null}
-    </Box>
-  ) : null;
+  const count = coupons.length;
 
   return {
     content: (
@@ -1091,8 +1064,7 @@ export const onHomePage: OnHomePageHandler = async () => {
         <Divider />
 
         <Text>
-          <Bold>Status:</Bold>{' '}
-          {hasCoupons ? `${coupons.length} coupon(s)` : 'No coupons yet'}
+          <Bold>Coupons:</Bold> {count}
         </Text>
 
         <Divider />
@@ -1116,7 +1088,35 @@ export const onHomePage: OnHomePageHandler = async () => {
           </Button>
         </Form>
 
-        {couponListContent}
+        <Divider />
+
+        <Text>
+          <Bold>
+            {count > 0 ? 'Your Coupons:' : 'No coupons yet - add one above!'}
+          </Bold>
+        </Text>
+
+        {count > 0 ? (
+          <Text>
+            {[coupons[0].label || coupons[0].id, ' (', coupons[0].poolType, ' on ', coupons[0].network, ')'].join('')}
+          </Text>
+        ) : (
+          <Text color="muted">Get started by pasting your gas card context</Text>
+        )}
+
+        {count > 1 ? (
+          <Text>
+            {[coupons[1].label || coupons[1].id, ' (', coupons[1].poolType, ' on ', coupons[1].network, ')'].join('')}
+          </Text>
+        ) : (
+          <Text> </Text>
+        )}
+
+        {count > 2 ? (
+          <Text color="muted">... and {count - 2} more</Text>
+        ) : (
+          <Text> </Text>
+        )}
 
         <Divider />
         <Text color="muted">
