@@ -1098,15 +1098,31 @@ export const onHomePage: OnHomePageHandler = async () => {
 
         {count > 0 ? (
           <Text>
-            {[coupons[0].label || coupons[0].id, ' (', coupons[0].poolType, ' on ', coupons[0].network, ')'].join('')}
+            {[
+              coupons[0].label || coupons[0].id,
+              ' (',
+              coupons[0].poolType,
+              ' on ',
+              coupons[0].network,
+              ')',
+            ].join('')}
           </Text>
         ) : (
-          <Text color="muted">Get started by pasting your gas card context</Text>
+          <Text color="muted">
+            Get started by pasting your gas card context
+          </Text>
         )}
 
         {count > 1 ? (
           <Text>
-            {[coupons[1].label || coupons[1].id, ' (', coupons[1].poolType, ' on ', coupons[1].network, ')'].join('')}
+            {[
+              coupons[1].label || coupons[1].id,
+              ' (',
+              coupons[1].poolType,
+              ' on ',
+              coupons[1].network,
+              ')',
+            ].join('')}
           </Text>
         ) : (
           <Text> </Text>

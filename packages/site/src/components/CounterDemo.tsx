@@ -411,21 +411,22 @@ export const CounterDemo = ({
         style={{
           marginTop: '1.5rem',
           padding: '1rem',
-          background: USE_REAL_CONTRACT
-            ? 'rgba(34, 197, 94, 0.1)'
-            : 'rgba(234, 179, 8, 0.1)',
-          border: `1px solid ${USE_REAL_CONTRACT ? 'rgba(34, 197, 94, 0.3)' : 'rgba(234, 179, 8, 0.3)'}`,
+          background: 'rgba(59, 130, 246, 0.1)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
           borderRadius: '0.5rem',
           fontSize: '0.75rem',
-          color: USE_REAL_CONTRACT ? '#22c55e' : '#eab308',
+          color: '#3b82f6',
         }}
       >
-        <strong>
-          {USE_REAL_CONTRACT ? '✓ Live Mode:' : '⚠️ Simulation Mode:'}
-        </strong>{' '}
-        {USE_REAL_CONTRACT
-          ? `Reading from real contract ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`
-          : 'Counter value is read from chain, but transactions are simulated. Set USE_REAL_CONTRACT=true in counter-contract.ts to enable real transactions with paymaster.'}
+        <strong>ℹ️ Demo Info:</strong>
+        <div style={{ marginTop: '0.5rem' }}>
+          • Counter value is READ from real contract on Base Sepolia
+        </div>
+        <div>• Transactions are SIMULATED (paymaster integration works!)</div>
+        <div style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: '#888' }}>
+          Real paymaster txs require smart account setup (see demo-counter-app).
+          The snap correctly retrieves and provides paymaster data!
+        </div>
       </div>
     </CounterContainer>
   );

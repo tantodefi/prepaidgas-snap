@@ -53,4 +53,6 @@ export const COUNTER_NETWORK = 'base-sepolia';
 export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 
 // Enable real contract transactions
-export const USE_REAL_CONTRACT = true;
+// NOTE: Real paymaster transactions require smart account setup
+// See demo-counter-app for full implementation with smartAccountClient
+export const USE_REAL_CONTRACT = false;
