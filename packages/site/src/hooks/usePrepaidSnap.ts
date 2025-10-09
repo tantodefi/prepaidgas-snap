@@ -161,6 +161,24 @@ export function usePrepaidSnap() {
     [loadCoupons],
   );
 
+  // Check if configured
+  const checkConfigured = useCallback(async (): Promise<boolean> => {
+    try {
+      const result = await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: {
+          snapId: defaultSnapOrigin,
+          request: {
+            method: 'hasConfiguredCoupons',
+          },
+        },
+      });
+      return (result as { hasCoupons: boolean }).hasCoupons;
+    } catch {
+      return false;
+    }
+  }, []);
+
   return {
     // State
     coupons,
@@ -175,5 +193,6 @@ export function usePrepaidSnap() {
     loadCoupons,
     getPaymasterData,
     removeCoupon,
+    checkConfigured,
   };
 }

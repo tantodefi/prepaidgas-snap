@@ -1058,7 +1058,7 @@ export const onHomePage: OnHomePageHandler = async () => {
       <Text>
         • {coupons[0].label || coupons[0].id} ({coupons[0].poolType})
       </Text>
-      <Text color="muted">  Network: {coupons[0].network}</Text>
+      <Text color="muted"> Network: {coupons[0].network}</Text>
       <Text color="muted">
         {' '}
         Paymaster: {coupons[0].paymasterAddress.slice(0, 10)}...
@@ -1069,7 +1069,7 @@ export const onHomePage: OnHomePageHandler = async () => {
         </Text>
       ) : null}
       {coupons.length > 1 ? (
-        <Text color="muted">  Network: {coupons[1].network}</Text>
+        <Text color="muted"> Network: {coupons[1].network}</Text>
       ) : null}
       {coupons.length > 2 ? (
         <Text>
@@ -1077,7 +1077,7 @@ export const onHomePage: OnHomePageHandler = async () => {
         </Text>
       ) : null}
       {coupons.length > 2 ? (
-        <Text color="muted">  Network: {coupons[2].network}</Text>
+        <Text color="muted"> Network: {coupons[2].network}</Text>
       ) : null}
       {coupons.length > 3 ? (
         <Text color="muted">... and {coupons.length - 3} more coupons</Text>
