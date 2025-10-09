@@ -1141,8 +1141,11 @@ export const onHomePage: OnHomePageHandler = async () => {
 export const onUserInput: OnUserInputHandler = async ({ id, event }) => {
   console.log('📥 User input received:', { id, event });
 
-  // Handle form submission from home page
-  if (event.type === 'FormSubmitEvent' && event.name === 'addCouponFormHome') {
+  // Handle form submission from home page or popup dialog
+  if (
+    event.type === 'FormSubmitEvent' &&
+    (event.name === 'addCouponFormHome' || event.name === 'addCouponFormDialog')
+  ) {
     const formData = event.value as Record<string, string>;
     const couponCode = formData.couponCode || '';
     const label = formData.label || '';
