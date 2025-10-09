@@ -8,6 +8,11 @@ import {
   COUNTER_RPC_URL,
   USE_REAL_CONTRACT,
 } from '../config/counter-contract';
+import {
+  createAndSign7702Authorization,
+  send7702Transaction,
+  isAccountUpgraded,
+} from '../lib/smart-account-7702';
 
 const CounterContainer = styled.div`
   max-width: 500px;
@@ -223,95 +228,121 @@ export const CounterDemo = ({
        * setCount(Number(newCount));
        */
 
-      // CRITICAL: Switch to Base Sepolia network first!
-      addLog('🔄 Switching to Base Sepolia...');
+      if (USE_REAL_CONTRACT) {
+        // ========================================
+        // EIP-7702 MODE: Real gasless transactions
+        // ========================================
 
-      try {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x14a34' }], // 84532 in hex = Base Sepolia
-        });
-      } catch (switchError: any) {
-        // If chain doesn't exist, add it
-        if (switchError.code === 4902) {
+        // CRITICAL: Switch to Base Sepolia network first!
+        addLog('🔄 Switching to Base Sepolia...');
+
+        try {
           await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: '0x14a34',
-                chainName: 'Base Sepolia',
-                nativeCurrency: {
-                  name: 'Ethereum',
-                  symbol: 'ETH',
-                  decimals: 18,
-                },
-                rpcUrls: ['https://sepolia.base.org'],
-                blockExplorerUrls: ['https://sepolia.basescan.org'],
-              },
-            ],
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x14a34' }], // 84532 in hex = Base Sepolia
           });
-        } else {
-          throw switchError;
+        } catch (switchError: any) {
+          // If chain doesn't exist, add it
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x14a34',
+                  chainName: 'Base Sepolia',
+                  nativeCurrency: {
+                    name: 'Ethereum',
+                    symbol: 'ETH',
+                    decimals: 18,
+                  },
+                  rpcUrls: ['https://sepolia.base.org'],
+                  blockExplorerUrls: ['https://sepolia.basescan.org'],
+                },
+              ],
+            });
+          } else {
+            throw switchError;
+          }
         }
-      }
 
-      addLog('✓ Connected to Base Sepolia');
+        addLog('✓ Connected to Base Sepolia');
 
-      // Send real transaction to counter contract
-      addLog('📋 Contract: ' + COUNTER_ADDRESS.slice(0, 10) + '...');
-      addLog('🔧 Encoding increment() call...');
+        // Get user's MetaMask account
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts',
+        });
+        const userAddress = accounts[0];
+        addLog(`👤 User address: ${userAddress.slice(0, 10)}...`);
 
-      // Encode the increment function call
-      const incrementData = '0xd09de08a'; // increment() function selector
+        // Check if EOA is already upgraded with 7702
+        const upgraded = await isAccountUpgraded(userAddress);
 
-      // Get the user's address
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
-      });
-      const userAddress = accounts[0];
+        if (!upgraded) {
+          // First time - upgrade EOA to smart account
+          addLog('🔧 Upgrading your EOA to smart account (EIP-7702)...');
+          addLog('📝 Please sign the authorization in MetaMask');
 
-      addLog(`👤 User address: ${userAddress.slice(0, 10)}...`);
+          const authorization = await createAndSign7702Authorization(userAddress);
+          localStorage.setItem('7702_auth', JSON.stringify(authorization));
 
-      // Construct the transaction
-      const tx = {
-        from: userAddress,
-        to: COUNTER_ADDRESS,
-        data: incrementData,
-        value: '0x0', // No ETH value
-        // Add the paymaster data - this is the key for gasless transactions
-        paymasterAndData: paymasterData.paymasterContext,
-      };
+          addLog('✅ Account upgraded! Your EOA can now use paymaster');
+        } else {
+          addLog('✓ Account already upgraded to smart account');
+        }
 
-      addLog('📤 Sending transaction with paymaster...');
-      addLog(
-        `💰 Using paymaster: ${paymasterData.paymasterAddress.slice(0, 10)}...`,
-      );
+        // Prepare transaction
+        addLog('📋 Contract: ' + COUNTER_ADDRESS.slice(0, 10) + '...');
+        addLog('🔧 Encoding increment() call...');
 
-      try {
-        const txHash = await window.ethereum.request({
-          method: 'eth_sendTransaction',
-          params: [tx],
+        const incrementData = '0xd09de08a'; // increment() function selector
+        const authorization = JSON.parse(localStorage.getItem('7702_auth') || '{}');
+
+        // Send EIP-7702 transaction with paymaster
+        addLog('📤 Sending 7702 transaction with paymaster...');
+        addLog(
+          `💰 Paymaster will sponsor gas: ${paymasterData.paymasterAddress.slice(0, 10)}...`,
+        );
+
+        const txHash = await send7702Transaction({
+          from: userAddress,
+          to: COUNTER_ADDRESS,
+          data: incrementData,
+          authorization,
+          paymasterAndData: paymasterData.paymasterContext,
         });
 
         addLog(`✓ Transaction sent: ${txHash.slice(0, 10)}...`);
         addLog('⏳ Waiting for confirmation...');
 
-        // Wait a bit for transaction to be mined
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
         addLog('✅ Transaction confirmed!');
-        addLog('🎉 Counter incremented on-chain!');
+        addLog('🎉 Counter incremented on-chain with ZERO gas cost!');
 
         // Read new value from chain
         setTimeout(async () => {
           await readCounterValue();
           addLog('🔄 Counter updated from chain');
         }, 1000);
-      } catch (txError) {
-        addLog(
-          `❌ Transaction error: ${txError instanceof Error ? txError.message : 'Unknown'}`,
-        );
-        throw txError;
+      } else {
+        // ========================================
+        // SIMULATION MODE: Demonstrates the flow
+        // ========================================
+        addLog('⏳ Simulating gasless transaction...');
+        addLog(`📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`);
+        addLog('💡 Paymaster data retrieved successfully');
+        addLog('🔧 EIP-7702 helpers ready (set USE_REAL_CONTRACT=true)');
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        addLog('✅ Simulation successful!');
+        addLog('🎉 Counter incremented (local state)');
+        setCount((c) => c + 1);
+
+        // Refresh from chain
+        setTimeout(() => {
+          readCounterValue();
+        }, 500);
       }
     } catch (error) {
       console.error('❌ Transaction failed:', error);

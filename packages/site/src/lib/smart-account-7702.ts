@@ -1,7 +1,7 @@
 /**
  * EIP-7702 Smart Account Implementation
  * Upgrade MetaMask EOA to use paymaster for gasless transactions
- * 
+ *
  * This is the CORE feature - making the snap actually useful!
  */
 
@@ -39,9 +39,7 @@ export async function createAndSign7702Authorization(
   // Sign with eth_signTypedData_v4
   const typedData = {
     types: {
-      EIP712Domain: [
-        { name: 'chainId', type: 'uint256' },
-      ],
+      EIP712Domain: [{ name: 'chainId', type: 'uint256' }],
       Authorization: [
         { name: 'chainId', type: 'uint256' },
         { name: 'address', type: 'address' },
@@ -148,4 +146,3 @@ declare global {
     ethereum: any;
   }
 }
-
