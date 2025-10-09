@@ -282,7 +282,8 @@ export const CounterDemo = ({
           addLog('🔧 Upgrading your EOA to smart account (EIP-7702)...');
           addLog('📝 Please sign the authorization in MetaMask');
 
-          const authorization = await createAndSign7702Authorization(userAddress);
+          const authorization =
+            await createAndSign7702Authorization(userAddress);
           localStorage.setItem('7702_auth', JSON.stringify(authorization));
 
           addLog('✅ Account upgraded! Your EOA can now use paymaster');
@@ -295,7 +296,9 @@ export const CounterDemo = ({
         addLog('🔧 Encoding increment() call...');
 
         const incrementData = '0xd09de08a'; // increment() function selector
-        const authorization = JSON.parse(localStorage.getItem('7702_auth') || '{}');
+        const authorization = JSON.parse(
+          localStorage.getItem('7702_auth') || '{}',
+        );
 
         // Send EIP-7702 transaction with paymaster
         addLog('📤 Sending 7702 transaction with paymaster...');
@@ -329,7 +332,9 @@ export const CounterDemo = ({
         // SIMULATION MODE: Demonstrates the flow
         // ========================================
         addLog('⏳ Simulating gasless transaction...');
-        addLog(`📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`);
+        addLog(
+          `📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`,
+        );
         addLog('💡 Paymaster data retrieved successfully');
         addLog('🔧 EIP-7702 helpers ready (set USE_REAL_CONTRACT=true)');
 
