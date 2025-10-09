@@ -1045,80 +1045,67 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
  */
 export const onHomePage: OnHomePageHandler = async () => {
   const coupons = await listCoupons();
+  const hasCoupons = coupons.length > 0;
+
+  // Build coupon list content
+  const couponListContent = hasCoupons
+    ? (
+        <Box>
+          <Divider />
+          <Text>
+            <Bold>Your Coupons:</Bold>
+          </Text>
+          <Text>• {coupons[0].label || coupons[0].id}</Text>
+          <Text>  {coupons[0].poolType} on {coupons[0].network}</Text>
+          {coupons.length > 1 ? (
+            <Text>• {coupons[1].label || coupons[1].id}</Text>
+          ) : null}
+          {coupons.length > 1 ? (
+            <Text>  {coupons[1].poolType} on {coupons[1].network}</Text>
+          ) : null}
+          {coupons.length > 2 ? (
+            <Text>... and {coupons.length - 2} more</Text>
+          ) : null}
+        </Box>
+      )
+    : null;
 
   return {
     content: (
       <Box>
         <Heading>💳 Prepaid Gas Manager</Heading>
-        <Text>Manage your prepaid gas coupons for gasless transactions</Text>
+        <Text>Manage prepaid gas coupons for gasless transactions</Text>
         <Divider />
 
-        <Banner
-          severity={coupons.length > 0 ? 'success' : 'info'}
-          title={
-            coupons.length > 0
-              ? `${coupons.length} Coupon${coupons.length > 1 ? 's' : ''} Available`
-              : 'Welcome to Prepaid Gas Manager!'
-          }
-        >
-          <Text>
-            {coupons.length > 0
-              ? 'Your prepaid gas credits are ready to use'
-              : 'Add your first coupon below to enable gasless transactions'}
-          </Text>
-        </Banner>
+        <Text>
+          <Bold>Status:</Bold> {hasCoupons ? `${coupons.length} coupon(s)` : 'No coupons yet'}
+        </Text>
 
         <Divider />
 
         <Text>
-          <Bold>
-            {coupons.length > 0
-              ? 'Add Another Coupon:'
-              : 'Add Your First Coupon:'}
-          </Bold>
+          <Bold>Add Coupon:</Bold>
         </Text>
 
         <Form name="addCouponFormHome">
           <Field label="Gas Card Context">
             <Input
               name="couponCode"
-              placeholder="Paste your complete gas card context here..."
+              placeholder="Paste gas card context from testnet.prepaidgas.xyz"
             />
           </Field>
-          <Field label="Label (Optional)">
-            <Input
-              name="label"
-              placeholder={
-                coupons.length > 0
-                  ? 'e.g., My Second Card'
-                  : 'e.g., My Gas Card'
-              }
-            />
+          <Field label="Label">
+            <Input name="label" placeholder="My Gas Card" />
           </Field>
           <Button type="submit" name="submitCoupon">
-            {coupons.length > 0
-              ? '+ Add Another Coupon'
-              : 'Configure Paymaster'}
+            Add Coupon
           </Button>
         </Form>
 
-        {coupons.length > 0 && (
-          <Box>
-            <Divider />
-            <Text>
-              <Bold>Your Coupons ({coupons.length}):</Bold>
-            </Text>
-            <Text>• {coupons[0]?.label || coupons[0]?.id}</Text>
-            <Text> Type: {coupons[0]?.poolType}</Text>
-            <Text> Network: {coupons[0]?.network}</Text>
-            {coupons.length > 1 && (
-              <Text>... and {coupons.length - 1} more</Text>
-            )}
-          </Box>
-        )}
+        {couponListContent}
 
         <Divider />
-        <Text color="muted">Get gas credits from testnet.prepaidgas.xyz</Text>
+        <Text color="muted">Get credits from testnet.prepaidgas.xyz</Text>
       </Box>
     ),
   };
