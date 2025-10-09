@@ -236,6 +236,31 @@ export const PrepaidConfig = () => {
         </StatusIndicator>
       )}
 
+      {/* Quick Add via Snap Dialog Button */}
+      <Button
+        onClick={async () => {
+          try {
+            const result = await window.ethereum.request({
+              method: 'wallet_invokeSnap',
+              params: {
+                snapId: defaultSnapOrigin,
+                request: { method: 'showAddCouponForm' },
+              },
+            });
+            console.log('Snap form result:', result);
+            // Reload coupons after adding
+            await loadCoupons();
+          } catch (err) {
+            console.error('Failed to show snap form:', err);
+          }
+        }}
+        fullWidth
+        variant="secondary"
+        style={{ marginBottom: '1rem' }}
+      >
+        ✨ Add Coupon in MetaMask
+      </Button>
+
       {/* Add Coupon Form - Show by default if no coupons */}
       {showForm || coupons.length === 0 ? (
         <Card
@@ -543,5 +568,3 @@ export const PrepaidConfig = () => {
     </ConfigContainer>
   );
 };
-
-
