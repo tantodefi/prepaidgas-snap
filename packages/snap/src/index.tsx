@@ -1109,8 +1109,8 @@ export const onHomePage: OnHomePageHandler = async () => {
               <Bold>Your Coupons ({coupons.length}):</Bold>
             </Text>
             <Text>• {coupons[0]?.label || coupons[0]?.id}</Text>
-            <Text>  Type: {coupons[0]?.poolType}</Text>
-            <Text>  Network: {coupons[0]?.network}</Text>
+            <Text> Type: {coupons[0]?.poolType}</Text>
+            <Text> Network: {coupons[0]?.network}</Text>
             {coupons.length > 1 && (
               <Text>... and {coupons.length - 1} more</Text>
             )}
