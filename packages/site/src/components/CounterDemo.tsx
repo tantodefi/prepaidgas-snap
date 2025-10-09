@@ -233,7 +233,9 @@ export const CounterDemo = ({
       } else {
         // SIMULATION MODE (Safe default)
         addLog('⏳ Simulating gasless transaction...');
-        addLog(`📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`);
+        addLog(
+          `📋 Contract: ${COUNTER_ADDRESS.slice(0, 10)}... on Base Sepolia`,
+        );
         addLog('💡 Using simulation mode (USE_REAL_CONTRACT=false)');
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -360,5 +362,3 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
-
-

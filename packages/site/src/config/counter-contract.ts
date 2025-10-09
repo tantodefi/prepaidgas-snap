@@ -42,7 +42,8 @@ export const COUNTER_ABI = [
 ] as const;
 
 // Counter contract address on Base Sepolia
-export const COUNTER_ADDRESS = '0x18B5EF94Bd6212d4764853142215F917c353011e' as const;
+export const COUNTER_ADDRESS =
+  '0x18B5EF94Bd6212d4764853142215F917c353011e' as const;
 
 // Network configuration - Base Sepolia
 export const COUNTER_CHAIN_ID = 84532;
