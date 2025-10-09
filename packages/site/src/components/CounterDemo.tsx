@@ -225,7 +225,7 @@ export const CounterDemo = ({
 
       // CRITICAL: Switch to Base Sepolia network first!
       addLog('🔄 Switching to Base Sepolia...');
-      
+
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
