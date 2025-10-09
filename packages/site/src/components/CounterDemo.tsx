@@ -231,9 +231,11 @@ export const CounterDemo = ({
       const incrementData = '0xd09de08a'; // increment() function selector
 
       // Get the user's address first
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      });
       const userAddress = accounts[0];
-      
+
       addLog(`👤 User address: ${userAddress.slice(0, 10)}...`);
 
       // Construct the transaction
