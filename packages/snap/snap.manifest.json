@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example",
+  "description": "Prepaid Gas Snap - Manage prepaid gas coupons and enable gasless transactions",
+  "proposedName": "Prepaid Gas Manager",
   "repository": {
     "type": "git",
     "url": "https://github.com/tantodefi/prepaidgas-snap.git"
   },
   "source": {
-    "shasum": "7t2STB5MXdDPEPonwpVNq5PMsLGWGKi09qoBHm/Ty8g=",
+    "shasum": "oOCeIHaMXhRTrOnxzwCFVvyAh3+eS42aR55Q2Nsjjq4=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
