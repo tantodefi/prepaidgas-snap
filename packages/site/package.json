@@ -27,10 +27,12 @@
   },
   "dependencies": {
     "@metamask/providers": "^22.1.0",
+    "permissionless": "^0.2.57",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
-    "styled-components": "5.3.3"
+    "styled-components": "5.3.3",
+    "viem": "^2.38.0"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.4.0",
