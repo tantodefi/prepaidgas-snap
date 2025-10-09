@@ -9,10 +9,12 @@ import {
   USE_REAL_CONTRACT,
 } from '../config/counter-contract';
 import {
-  createAndSign7702Authorization,
-  send7702Transaction,
-  isAccountUpgraded,
-} from '../lib/smart-account-7702';
+  setupClients,
+  authorizeMetaMask7702,
+  submit7702Authorization,
+  createMetaMaskSmartAccount,
+  sendUserOperationWithPaymaster,
+} from '../lib/metamask-7702';
 
 const CounterContainer = styled.div`
   max-width: 500px;

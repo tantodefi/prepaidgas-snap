@@ -1,7 +1,7 @@
 /**
  * MetaMask EIP-7702 Implementation
  * Using official @metamask/delegation-toolkit
- * 
+ *
  * Docs: https://docs.metamask.io/delegation-toolkit/get-started/smart-account-quickstart/eip7702
  */
 
@@ -10,12 +10,21 @@ import {
   toMetaMaskSmartAccount,
   getDeleGatorEnvironment,
 } from '@metamask/delegation-toolkit';
-import { createPublicClient, createWalletClient, http, type Account } from 'viem';
+import {
+  createPublicClient,
+  createWalletClient,
+  http,
+  type WalletClient,
+  type PublicClient,
+} from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { createBundlerClient } from 'viem/account-abstraction';
 import { COUNTER_CHAIN_ID } from '../config/counter-contract';
 
-const BUNDLER_RPC = process.env.NEXT_PUBLIC_BUNDLER_RPC || 'https://bundler.base.org';
+// Bundler RPC endpoint - required for user operations
+const BUNDLER_RPC =
+  process.env.NEXT_PUBLIC_BUNDLER_RPC ||
+  'https://api.pimlico.io/v2/base-sepolia/rpc?apikey=YOUR_API_KEY';
 
 /**
  * Set up clients for 7702
@@ -43,7 +52,8 @@ export async function authorizeMetaMask7702(account: Account) {
 
   // Get the stateless 7702 delegator contract for this network
   const environment = getDeleGatorEnvironment(COUNTER_CHAIN_ID);
-  const contractAddress = environment.implementations.EIP7702StatelessDeleGatorImpl;
+  const contractAddress =
+    environment.implementations.EIP7702StatelessDeleGatorImpl;
 
   console.log('Contract address:', contractAddress);
 
@@ -158,4 +168,3 @@ export async function sendUserOperationWithPaymaster(params: {
     throw error;
   }
 }
-
