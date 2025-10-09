@@ -180,10 +180,12 @@ export const CounterDemo = ({
     try {
       // Get paymaster data from snap (user will confirm in MetaMask)
       addLog('📞 Requesting paymaster data from snap...');
+      addLog(`🔑 Using coupon: ${selectedCoupon?.id}`);
+      
       const paymasterData = await getPaymasterData();
 
       if (!paymasterData) {
-        throw new Error('Failed to get paymaster data');
+        throw new Error('Failed to get paymaster data - check MetaMask');
       }
 
       addLog(
@@ -250,13 +252,17 @@ export const CounterDemo = ({
         }, 500);
       }
     } catch (error) {
-      console.error('Transaction failed:', error);
-      if (error instanceof Error && error.message.includes('rejected')) {
-        addLog('❌ User rejected transaction');
+      console.error('❌ Transaction failed:', error);
+      if (error instanceof Error) {
+        if (error.message.includes('rejected')) {
+          addLog('❌ User rejected transaction in MetaMask');
+        } else if (error.message.includes('not found')) {
+          addLog('❌ Coupon not found - try refreshing the page');
+        } else {
+          addLog(`❌ Error: ${error.message}`);
+        }
       } else {
-        addLog(
-          `❌ Transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        );
+        addLog('❌ Transaction failed: Unknown error');
       }
     } finally {
       setIsSending(false);
