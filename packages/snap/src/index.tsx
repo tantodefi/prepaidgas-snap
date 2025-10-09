@@ -973,6 +973,14 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     // Admin Methods
     // ========================================================================
 
+    case 'hasConfiguredCoupons': {
+      const allCoupons = await listCoupons();
+      return {
+        hasCoupons: allCoupons.length > 0,
+        count: allCoupons.length,
+      };
+    }
+
     case 'clearCoupons': {
       const confirmed = await snap.request({
         method: 'snap_dialog',
@@ -1000,14 +1008,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
       await clearAllCoupons();
       return { success: true };
-    }
-
-    case 'hasConfiguredCoupons': {
-      const allCoupons = await listCoupons();
-      return {
-        hasCoupons: allCoupons.length > 0,
-        count: allCoupons.length,
-      };
     }
 
     // ========================================================================
@@ -1056,39 +1056,29 @@ export const onHomePage: OnHomePageHandler = async () => {
   const coupons = await listCoupons();
   const hasCoupons = coupons.length > 0;
 
-  // Build coupon list content - shows up to 3 coupons
+  // Build coupon list content
   const couponListContent = hasCoupons ? (
     <Box>
       <Divider />
       <Text>
-        <Bold>Your Coupons ({coupons.length}):</Bold>
+        <Bold>Your Coupons:</Bold>
       </Text>
+      <Text>• {coupons[0].label || coupons[0].id}</Text>
       <Text>
-        • {coupons[0].label || coupons[0].id} ({coupons[0].poolType})
-      </Text>
-      <Text color="muted"> Network: {coupons[0].network}</Text>
-      <Text color="muted">
         {' '}
-        Paymaster: {coupons[0].paymasterAddress.slice(0, 10)}...
+        {coupons[0].poolType} on {coupons[0].network}
       </Text>
       {coupons.length > 1 ? (
-        <Text>
-          • {coupons[1].label || coupons[1].id} ({coupons[1].poolType})
-        </Text>
+        <Text>• {coupons[1].label || coupons[1].id}</Text>
       ) : null}
       {coupons.length > 1 ? (
-        <Text color="muted"> Network: {coupons[1].network}</Text>
-      ) : null}
-      {coupons.length > 2 ? (
         <Text>
-          • {coupons[2].label || coupons[2].id} ({coupons[2].poolType})
+          {' '}
+          {coupons[1].poolType} on {coupons[1].network}
         </Text>
       ) : null}
       {coupons.length > 2 ? (
-        <Text color="muted"> Network: {coupons[2].network}</Text>
-      ) : null}
-      {coupons.length > 3 ? (
-        <Text color="muted">... and {coupons.length - 3} more coupons</Text>
+        <Text>... and {coupons.length - 2} more</Text>
       ) : null}
     </Box>
   ) : null;

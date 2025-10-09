@@ -84,10 +84,3 @@ export const Button = styled.button<ButtonProps>`
     outline-offset: 2px;
   }
 `;
-
-interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
-  disabled?: boolean;
-  fullWidth?: boolean;
-}

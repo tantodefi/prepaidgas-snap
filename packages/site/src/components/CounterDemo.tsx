@@ -277,7 +277,3 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
-
-import { Button } from './ui/Button';
-import type { PrepaidCoupon, PaymasterData } from '../hooks/usePrepaidSnap';
-

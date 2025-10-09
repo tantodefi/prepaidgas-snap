@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
-  "description": "Prepaid Gas Snap - Manage prepaid gas coupons and enable gasless transactions",
-  "proposedName": "Prepaid Gas Manager",
+  "description": "Manage prepaid gas coupons and enable gasless transactions via paymaster integration.",
+  "proposedName": "Prepaid Gas",
   "repository": {
     "type": "git",
     "url": "https://github.com/tantodefi/prepaidgas-snap.git"
   },
   "source": {
-    "shasum": "HjuIddQwGyVUJo5+e1/2vW1xGlAYUJJCVbBaYxII4m4=",
+    "shasum": "3fogYu9KT9xo8F1NB/4vcjsYz2QoRxsiJDRzLqBsH3M=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
