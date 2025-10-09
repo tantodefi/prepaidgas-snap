@@ -230,12 +230,18 @@ export const CounterDemo = ({
       // Encode the increment function call
       const incrementData = '0xd09de08a'; // increment() function selector
 
+      // Get the user's address first
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      const userAddress = accounts[0];
+      
+      addLog(`👤 User address: ${userAddress.slice(0, 10)}...`);
+
       // Construct the transaction
       const tx = {
+        from: userAddress,
         to: COUNTER_ADDRESS,
         data: incrementData,
         value: '0x0', // No ETH value
-        from: window.ethereum.selectedAddress,
         // Add the paymaster data - this is the key for gasless transactions
         paymasterAndData: paymasterData.paymasterContext,
       };
