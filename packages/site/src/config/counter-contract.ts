@@ -55,4 +55,7 @@ export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 // Enable real contract transactions
 // NOTE: Real paymaster transactions require smart account setup
 // See demo-counter-app for full implementation with smartAccountClient
-export const USE_REAL_CONTRACT = true;
+// Enable real contract transactions with MetaMask Delegation Toolkit
+// Using official @metamask/delegation-toolkit for EIP-7702
+// Docs: https://docs.metamask.io/delegation-toolkit/get-started/smart-account-quickstart/eip7702
+export const USE_REAL_CONTRACT = false; // Set to true when ready to test with delegation toolkit
