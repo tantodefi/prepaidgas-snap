@@ -22,9 +22,11 @@ import { createBundlerClient } from 'viem/account-abstraction';
 import { COUNTER_CHAIN_ID } from '../config/counter-contract';
 
 // Bundler RPC endpoint - required for user operations
+// Default to localhost:4337 (same as demo-counter-app)
+// Or use cloud bundler: Pimlico, Alchemy, etc.
 const BUNDLER_RPC =
-  process.env.NEXT_PUBLIC_BUNDLER_RPC ||
-  'https://api.pimlico.io/v2/base-sepolia/rpc?apikey=YOUR_API_KEY';
+  process.env.NEXT_PUBLIC_BUNDLER_URL ||
+  'http://localhost:4337';
 
 /**
  * Set up clients for 7702

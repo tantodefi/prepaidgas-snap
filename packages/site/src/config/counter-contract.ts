@@ -58,4 +58,15 @@ export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 // Enable real contract transactions with MetaMask Delegation Toolkit
 // Using official @metamask/delegation-toolkit for EIP-7702
 // Docs: https://docs.metamask.io/delegation-toolkit/get-started/smart-account-quickstart/eip7702
-export const USE_REAL_CONTRACT = false; // Set to true when ready to test with delegation toolkit
+//
+// REQUIREMENTS:
+// 1. Bundler running on localhost:4337 (or set NEXT_PUBLIC_BUNDLER_URL)
+// 2. Base Sepolia testnet ETH in your account
+// 3. Prepaid gas coupon added to snap
+//
+// To run local bundler (same as demo-counter-app):
+// - Clone https://github.com/eth-infinitism/bundler
+// - Run: yarn && yarn preprocess && yarn hardhat-node (in one terminal)
+// - Run: yarn run bundler (in another terminal)
+//
+export const USE_REAL_CONTRACT = false; // Set to true when bundler is running
