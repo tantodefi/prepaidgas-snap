@@ -241,7 +241,9 @@ export const CounterDemo = ({
       };
 
       addLog('📤 Sending transaction with paymaster...');
-      addLog(`💰 Using paymaster: ${paymasterData.paymasterAddress.slice(0, 10)}...`);
+      addLog(
+        `💰 Using paymaster: ${paymasterData.paymasterAddress.slice(0, 10)}...`,
+      );
 
       try {
         const txHash = await window.ethereum.request({
@@ -264,7 +266,9 @@ export const CounterDemo = ({
           addLog('🔄 Counter updated from chain');
         }, 1000);
       } catch (txError) {
-        addLog(`❌ Transaction error: ${txError instanceof Error ? txError.message : 'Unknown'}`);
+        addLog(
+          `❌ Transaction error: ${txError instanceof Error ? txError.message : 'Unknown'}`,
+        );
         throw txError;
       }
     } catch (error) {
@@ -384,4 +388,3 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
-
