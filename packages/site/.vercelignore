@@ -1,9 +1,0 @@
-# Vercel ignore file
-.cache
-node_modules
-.yarn
-.pnp.*
-.DS_Store
-*.log
-.env*.local
-

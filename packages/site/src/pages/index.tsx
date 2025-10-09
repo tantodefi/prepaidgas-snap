@@ -180,3 +180,37 @@ const Index = () => {
 };
 
 export default Index;
+
+        <Card
+          content={{
+            title: 'Send Hello message',
+            description:
+              'Display a custom message within a confirmation screen in MetaMask.',
+            button: (
+              <SendHelloButton
+                onClick={handleSendHelloClick}
+                disabled={!installedSnap}
+              />
+            ),
+          }}
+          disabled={!installedSnap}
+          fullWidth={
+            isMetaMaskReady &&
+            Boolean(installedSnap) &&
+            !shouldDisplayReconnectButton(installedSnap)
+          }
+        />
+        <Notice>
+          <p>
+            Please note that the <b>snap.manifest.json</b> and{' '}
+            <b>package.json</b> must be located in the server root directory and
+            the bundle must be hosted at the location specified by the location
+            field.
+          </p>
+        </Notice>
+      </CardContainer>
+    </Container>
+  );
+};
+
+export default Index;

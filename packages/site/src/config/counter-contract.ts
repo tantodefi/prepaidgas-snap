@@ -1,19 +1,11 @@
 /**
  * Counter Contract Configuration
- * 
- * TODO: Update these values with your actual deployed counter contract
- * The counter contract from demo.prepaidgas.xyz
+ * From demo.prepaidgas.xyz demo-counter-app
+ * Contract deployed on Base Sepolia at 0x18B5EF94Bd6212d4764853142215F917c353011e
  */
 
-// Simple Counter ABI - just the functions we need
+// Counter ABI (from prepaid-gas-packages/apps/demo-counter-app/lib/contracts/counter.ts)
 export const COUNTER_ABI = [
-  {
-    inputs: [],
-    name: 'increment',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
   {
     inputs: [],
     name: 'count',
@@ -23,22 +15,42 @@ export const COUNTER_ABI = [
   },
   {
     inputs: [],
-    name: 'number',
-    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-    stateMutability: 'view',
+    name: 'increment',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newCount',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    name: 'CounterIncremented',
+    type: 'event',
   },
 ] as const;
 
-// TODO: Replace with your actual counter contract address
-// Get this from demo.prepaidgas.xyz or your deployment
-export const COUNTER_ADDRESS = process.env.NEXT_PUBLIC_COUNTER_ADDRESS || 
-  '0x0000000000000000000000000000000000000000'; // Placeholder
+// Counter contract address on Base Sepolia
+export const COUNTER_ADDRESS = '0x18B5EF94Bd6212d4764853142215F917c353011e' as const;
 
-// Network configuration
-export const COUNTER_CHAIN_ID = 11155111; // Sepolia
-export const COUNTER_NETWORK = 'sepolia';
+// Network configuration - Base Sepolia
+export const COUNTER_CHAIN_ID = 84532;
+export const COUNTER_NETWORK = 'base-sepolia';
 
-// Whether to use real contract or simulation
-export const USE_REAL_CONTRACT = false; // Set to true when contract is configured
+// RPC endpoint for Base Sepolia
+export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 
+// Enable real contract transactions (simulation only for now)
+// Set to true when you're ready to send real transactions
+export const USE_REAL_CONTRACT = false;
