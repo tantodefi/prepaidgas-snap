@@ -921,18 +921,18 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
                   Paste your gas card context from testnet.prepaidgas.xyz
                 </Text>
               </Banner>
-              <Form name="addCouponForm">
+              <Form name="addCouponFormDialog">
                 <Field label="Gas Card Context">
                   <Input
                     name="couponCode"
                     placeholder="Paste your complete gas card context here..."
                   />
                 </Field>
-                <Field label="Label (Optional)">
-                  <Input name="label" placeholder="e.g., My Gas Card" />
+                <Field label="Label">
+                  <Input name="label" placeholder="My Gas Card" />
                 </Field>
-                <Button type="submit" name="submit">
-                  Configure
+                <Button type="submit" name="submitDialog">
+                  Add Coupon
                 </Button>
               </Form>
             </Box>
