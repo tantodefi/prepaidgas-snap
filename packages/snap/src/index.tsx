@@ -386,13 +386,13 @@ async function showAddCouponFormDialog(
               <Divider />
               <Section>
                 <Row label="Coupon ID">
-                  <Value value={newCoupon.id} />
+                  <Text>{newCoupon.id}</Text>
                 </Row>
                 <Row label="Type">
-                  <Value value={newCoupon.poolType} />
+                  <Text>{newCoupon.poolType}</Text>
                 </Row>
                 <Row label="Network">
-                  <Value value={newCoupon.network} />
+                  <Text>{newCoupon.network}</Text>
                 </Row>
               </Section>
             </Box>
@@ -590,16 +590,16 @@ async function showCouponDetailsDialog(coupon: PrepaidCoupon): Promise<void> {
 
           <Section>
             <Row label="Coupon ID">
-              <Value value={coupon.id} />
+              <Text>{coupon.id}</Text>
             </Row>
             <Row label="Pool Type">
-              <Value value={coupon.poolType} />
+              <Text>{coupon.poolType}</Text>
             </Row>
             <Row label="Network">
-              <Value value={coupon.network} />
+              <Text>{coupon.network}</Text>
             </Row>
             <Row label="Chain ID">
-              <Value value={coupon.chainId} />
+              <Text>{coupon.chainId}</Text>
             </Row>
           </Section>
 
@@ -663,13 +663,13 @@ async function showCouponsListDialog(): Promise<void> {
           <Section>
             <Heading>{coupon.label || coupon.id}</Heading>
             <Row label="Type">
-              <Value value={coupon.poolType} />
+              <Text>{coupon.poolType}</Text>
             </Row>
             <Row label="Network">
-              <Value value={coupon.network} />
+              <Text>{coupon.network}</Text>
             </Row>
             <Row label="Added">
-              <Value value={new Date(coupon.addedAt).toLocaleDateString()} />
+              <Text>{new Date(coupon.addedAt).toLocaleDateString()}</Text>
             </Row>
           </Section>
           <Divider />
@@ -732,10 +732,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
               <Divider />
               <Section>
                 <Row label="Network">
-                  <Value value={params.network || 'Unknown'} />
+                  <Text>{params.network || 'Unknown'}</Text>
                 </Row>
                 <Row label="Pool Type">
-                  <Value value={params.poolType} />
+                  <Text>{params.poolType}</Text>
                 </Row>
                 <Row label="Paymaster">
                   <Value

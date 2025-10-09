@@ -181,7 +181,7 @@ export const CounterDemo = ({
       // Get paymaster data from snap (user will confirm in MetaMask)
       addLog('📞 Requesting paymaster data from snap...');
       addLog(`🔑 Using coupon: ${selectedCoupon?.id}`);
-      
+
       const paymasterData = await getPaymasterData();
 
       if (!paymasterData) {
