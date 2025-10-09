@@ -738,9 +738,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
                   <Text>{params.poolType}</Text>
                 </Row>
                 <Row label="Paymaster">
-                  <Value
-                    value={`${params.paymasterAddress.slice(0, 6)}...${params.paymasterAddress.slice(-4)}`}
-                  />
+                  <Text>
+                    {`${params.paymasterAddress.slice(0, 6)}...${params.paymasterAddress.slice(-4)}`}
+                  </Text>
                 </Row>
               </Section>
               <Divider />
