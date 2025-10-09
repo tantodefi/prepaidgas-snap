@@ -223,6 +223,40 @@ export const CounterDemo = ({
        * setCount(Number(newCount));
        */
 
+      // CRITICAL: Switch to Base Sepolia network first!
+      addLog('🔄 Switching to Base Sepolia...');
+      
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x14a34' }], // 84532 in hex = Base Sepolia
+        });
+      } catch (switchError: any) {
+        // If chain doesn't exist, add it
+        if (switchError.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x14a34',
+                chainName: 'Base Sepolia',
+                nativeCurrency: {
+                  name: 'Ethereum',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://sepolia.base.org'],
+                blockExplorerUrls: ['https://sepolia.basescan.org'],
+              },
+            ],
+          });
+        } else {
+          throw switchError;
+        }
+      }
+
+      addLog('✓ Connected to Base Sepolia');
+
       // Send real transaction to counter contract
       addLog('📋 Contract: ' + COUNTER_ADDRESS.slice(0, 10) + '...');
       addLog('🔧 Encoding increment() call...');
@@ -230,7 +264,7 @@ export const CounterDemo = ({
       // Encode the increment function call
       const incrementData = '0xd09de08a'; // increment() function selector
 
-      // Get the user's address first
+      // Get the user's address
       const accounts = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });
