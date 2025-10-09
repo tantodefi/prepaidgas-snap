@@ -840,6 +840,7 @@ The snap and paymaster integration **already works** - you just need to connect 
 ### Implemented Features
 
 ✅ **Snap Core** (packages/snap/src/index.tsx)
+
 - Secure coupon storage with `snap_manageState`
 - 10 API methods for dapp integration
 - Interactive home page with Form components
@@ -848,6 +849,7 @@ The snap and paymaster integration **already works** - you just need to connect 
 - User input handler for interactive forms
 
 ✅ **Companion Site** (packages/site - localhost:8000)
+
 - Self-contained UI (no monorepo dependencies)
 - Two-tab configuration (Quick/Manual modes)
 - Counter demo with gasless transaction simulation
@@ -855,42 +857,46 @@ The snap and paymaster integration **already works** - you just need to connect 
 - Coupon management interface
 
 ✅ **Integration Components** (apps/web)
+
 - React hooks for snap integration
 - Status indicators for dapps
 - Configuration dialogs
 - Ready to integrate with testnet.prepaidgas.xyz
 
 ✅ **Deployment**
+
 - Site deployed to Vercel
 - Code on GitHub
 - Ready for npm publication
 
 ### API Methods Summary
 
-| Method | Purpose | User Confirmation |
-|--------|---------|-------------------|
-| `addCoupon` | Add new coupon | ✓ Yes |
-| `getCoupon` | Get coupon by ID | No |
-| `listCoupons` | List all coupons | No |
-| `removeCoupon` | Remove a coupon | ✓ Yes |
-| `getPaymasterCallData` | Get paymaster for tx | ✓ Yes |
-| `showAddCouponDialog` | Simple prompt dialog | No |
-| `showAddCouponForm` | Interactive form | No |
-| `showCouponsList` | Display all coupons | No |
-| `showCouponDetails` | Show coupon info | No |
-| `clearCoupons` | Remove all | ✓ Yes |
-| `hasConfiguredCoupons` | Check if configured | No |
+| Method                 | Purpose              | User Confirmation |
+| ---------------------- | -------------------- | ----------------- |
+| `addCoupon`            | Add new coupon       | ✓ Yes             |
+| `getCoupon`            | Get coupon by ID     | No                |
+| `listCoupons`          | List all coupons     | No                |
+| `removeCoupon`         | Remove a coupon      | ✓ Yes             |
+| `getPaymasterCallData` | Get paymaster for tx | ✓ Yes             |
+| `showAddCouponDialog`  | Simple prompt dialog | No                |
+| `showAddCouponForm`    | Interactive form     | No                |
+| `showCouponsList`      | Display all coupons  | No                |
+| `showCouponDetails`    | Show coupon info     | No                |
+| `clearCoupons`         | Remove all           | ✓ Yes             |
+| `hasConfiguredCoupons` | Check if configured  | No                |
 
 ### Counter Demo Notes
 
 **Current State:** Simulation (local counter)  
 **To Wire to Real Contract:**
+
 1. Get your counter contract address from demo.prepaidgas.xyz
 2. Add contract ABI to CounterDemo.tsx
 3. Replace TODO with actual contract call using paymaster data
 4. The snap already provides the correct paymaster context!
 
 **Gas Balance:** Snap stores paymaster context but doesn't track gas usage. To show balance:
+
 - Query the paymaster contract on-chain
 - Or track usage in your backend
 - Snap can store usage count in state if needed
