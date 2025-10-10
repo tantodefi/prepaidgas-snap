@@ -22,10 +22,13 @@ import { createBundlerClient } from 'viem/account-abstraction';
 import { COUNTER_CHAIN_ID } from '../config/counter-contract';
 
 // Bundler RPC endpoint - required for user operations
-// Default to localhost:4337 (same as demo-counter-app)
-// Or use cloud bundler: Pimlico, Alchemy, etc.
+// Option 1: Flashbots Sepolia Relay (DEFAULT - no setup needed!)
+// Option 2: Local bundler at localhost:4337
+// Option 3: Cloud bundler via NEXT_PUBLIC_BUNDLER_URL env var
 const BUNDLER_RPC =
-  process.env.NEXT_PUBLIC_BUNDLER_URL || 'http://localhost:4337';
+  process.env.NEXT_PUBLIC_BUNDLER_URL ||
+  'https://relay-sepolia.flashbots.net'; // Flashbots default
+  // 'http://localhost:4337'; // Uncomment for local bundler
 
 /**
  * Set up clients for 7702
