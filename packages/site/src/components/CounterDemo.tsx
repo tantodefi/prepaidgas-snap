@@ -15,6 +15,7 @@ import {
   createMetaMaskSmartAccount,
   sendUserOperationWithPaymaster,
 } from '../lib/metamask-7702';
+import { isAccountUpgraded } from '../lib/smart-account-7702';
 
 const CounterContainer = styled.div`
   max-width: 500px;
@@ -469,3 +470,4 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
+
