@@ -26,9 +26,8 @@ import { COUNTER_CHAIN_ID } from '../config/counter-contract';
 // Option 2: Local bundler at localhost:4337
 // Option 3: Cloud bundler via NEXT_PUBLIC_BUNDLER_URL env var
 const BUNDLER_RPC =
-  process.env.NEXT_PUBLIC_BUNDLER_URL ||
-  'https://relay-sepolia.flashbots.net'; // Flashbots default
-  // 'http://localhost:4337'; // Uncomment for local bundler
+  process.env.NEXT_PUBLIC_BUNDLER_URL || 'https://relay-sepolia.flashbots.net'; // Flashbots default
+// 'http://localhost:4337'; // Uncomment for local bundler
 
 /**
  * Set up clients for 7702
