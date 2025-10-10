@@ -283,15 +283,30 @@ export const CounterDemo = ({
         const upgraded = await isAccountUpgraded(userAddress);
 
         if (!upgraded) {
-          // First time - upgrade EOA to smart account
+          // First time - upgrade EOA to smart account using MetaMask Delegation Toolkit
           addLog('🔧 Upgrading your EOA to smart account (EIP-7702)...');
           addLog('📝 Please sign the authorization in MetaMask');
 
-          const authorization =
-            await createAndSign7702Authorization(userAddress);
-          localStorage.setItem('7702_auth', JSON.stringify(authorization));
+          // Create account object
+          const accountObj = {
+            address: userAddress as `0x${string}`,
+            type: 'json-rpc' as const,
+          };
+
+          const { publicClient } = setupClients();
+          const authorization = await authorizeMetaMask7702(accountObj as any);
+          
+          // Create wallet client  
+          const walletClient = createWalletClient({
+            account: accountObj as any,
+            chain: baseSepolia,
+            transport: http(),
+          });
+
+          await submit7702Authorization(walletClient, authorization);
 
           addLog('✅ Account upgraded! Your EOA can now use paymaster');
+          localStorage.setItem('7702_upgraded', 'true');
         } else {
           addLog('✓ Account already upgraded to smart account');
         }
