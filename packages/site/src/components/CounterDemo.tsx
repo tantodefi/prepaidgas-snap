@@ -16,6 +16,8 @@ import {
   sendUserOperationWithPaymaster,
 } from '../lib/metamask-7702';
 import { isAccountUpgraded } from '../lib/smart-account-7702';
+import { createWalletClient, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 
 const CounterContainer = styled.div`
   max-width: 500px;
@@ -470,4 +472,3 @@ export const CounterDemo = ({
     </CounterContainer>
   );
 };
-
