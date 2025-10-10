@@ -25,8 +25,7 @@ import { COUNTER_CHAIN_ID } from '../config/counter-contract';
 // Default to localhost:4337 (same as demo-counter-app)
 // Or use cloud bundler: Pimlico, Alchemy, etc.
 const BUNDLER_RPC =
-  process.env.NEXT_PUBLIC_BUNDLER_URL ||
-  'http://localhost:4337';
+  process.env.NEXT_PUBLIC_BUNDLER_URL || 'http://localhost:4337';
 
 /**
  * Set up clients for 7702

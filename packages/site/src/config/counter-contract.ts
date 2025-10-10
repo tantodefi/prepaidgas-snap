@@ -59,14 +59,22 @@ export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 // Using official @metamask/delegation-toolkit for EIP-7702
 // Docs: https://docs.metamask.io/delegation-toolkit/get-started/smart-account-quickstart/eip7702
 //
+// BUNDLER OPTIONS (set in metamask-7702.ts):
+// 1. Flashbots Sepolia Relay (DEFAULT): https://relay-sepolia.flashbots.net
+//    - No setup needed, works out of the box
+//    - Docs: https://docs.flashbots.net/flashbots-auction/advanced/rpc-endpoint
+//
+// 2. Local Bundler: http://localhost:4337
+//    - Clone: https://github.com/eth-infinitism/bundler
+//    - Run: yarn && yarn preprocess && yarn hardhat-node
+//    - Run: yarn run bundler (in another terminal)
+//
+// 3. Cloud Bundler: Set NEXT_PUBLIC_BUNDLER_URL environment variable
+//    - Pimlico: https://api.pimlico.io/v2/base-sepolia/rpc?apikey=KEY
+//    - Alchemy: https://alchemy.com bundler endpoint
+//
 // REQUIREMENTS:
-// 1. Bundler running on localhost:4337 (or set NEXT_PUBLIC_BUNDLER_URL)
-// 2. Base Sepolia testnet ETH in your account
-// 3. Prepaid gas coupon added to snap
+// - Base Sepolia testnet ETH in your account
+// - Prepaid gas coupon added to snap
 //
-// To run local bundler (same as demo-counter-app):
-// - Clone https://github.com/eth-infinitism/bundler
-// - Run: yarn && yarn preprocess && yarn hardhat-node (in one terminal)
-// - Run: yarn run bundler (in another terminal)
-//
-export const USE_REAL_CONTRACT = false; // Set to true when bundler is running
+export const USE_REAL_CONTRACT = false; // Set to true when ready to test!
