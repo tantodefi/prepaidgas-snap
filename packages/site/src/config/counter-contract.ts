@@ -77,4 +77,4 @@ export const COUNTER_RPC_URL = 'https://sepolia.base.org';
 // - Base Sepolia testnet ETH in your account
 // - Prepaid gas coupon added to snap
 //
-export const USE_REAL_CONTRACT = false; // Set to true when ready to test!
+export const USE_REAL_CONTRACT = true; // ✅ ENABLED - Real EIP-7702 transactions!
